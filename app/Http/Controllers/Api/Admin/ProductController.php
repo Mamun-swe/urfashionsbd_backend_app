@@ -81,6 +81,13 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+        $sku = Product::where('sku', $request->sku)->first();
+        if($sku){
+            return response()->json([
+                'status' => false,
+                'message' => 'SKU already exist',
+            ]);
+        }
 
         $file = $request->file('basic_image');
         $extension = $file->getClientOriginalExtension();
