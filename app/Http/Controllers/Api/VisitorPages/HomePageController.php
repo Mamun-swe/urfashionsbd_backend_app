@@ -11,11 +11,13 @@ use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\Slider;
 use App\Models\Review;
+use App\Models\ContactMail;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Mail;
 use Validator;
-use Mail;
+// use Mail;
 
 class HomePageController extends Controller
 {
@@ -392,11 +394,8 @@ class HomePageController extends Controller
                 $orderedProduct->price = $product['price'];
                 $orderedProduct->save();
             }
-    //         Mail::send('Mail.index', $data, function($message) {
-    //         $message->to('golamrabbi5242@gmail.com', 'Golam Rabbi')->subject
-    //         ('Order Confirmation');
-    //         $message->from('billing@urfashionsbd.com','Ur Fashion');
-    //   });
+
+                
 
             return response()->json($this->randomCode(), 200);
         }
@@ -406,6 +405,47 @@ class HomePageController extends Controller
     // Contact Mail Send
     public function sendEmail(Request $request)
     {
+
+
+        $rules = [
+            'name' => 'required|string',
+            'email' => 'required|string|email',
+            'phone' => 'required|string|max:255|regex:/(01)[0-9]{9}/',
+            'subject' => 'required|string',
+            'message' => 'required|string',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => $validator->messages(),
+            ], 422);
+        }
+
+        $data = new ContactMail();
+        $data->name = $request->get('name');
+        $data->email= $request->get('email');
+        $data->phone = $request->get('phone');
+        $data->subject = $request->get('subject');
+        $data->message = $request->get('message');
+    
+     Mail::send('mail.index',compact('data'), function($message) use ($data){
+    $message->from($data->email, $data->name);
+    $message->to('billing@urfashionsbd.com', 'UR Fashion')->subject($data->subject);
+
+      });
+
+      if(Mail::failures()){
+        return response()->json([
+            'status'=>false,
+            'message'=>'Failed! Internal Server Error'
+        ],501);
+      }
         
+        return response()->json([
+            'status'=>true,
+            'message'=>'Success! Mail Send Successful'
+        ],200);
     }
+
 }
