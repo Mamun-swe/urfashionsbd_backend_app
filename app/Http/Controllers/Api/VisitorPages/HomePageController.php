@@ -347,6 +347,7 @@ class HomePageController extends Controller
     // Confirm Order
     public function confirmOrder(Request $request)
     {
+
         $rules = [
             'name' => 'required|string',
             'phone' => 'required|string|max:255|regex:/(01)[0-9]{9}/',
@@ -381,11 +382,25 @@ class HomePageController extends Controller
             'coupon_code' => $request->coupon_code ? $request->coupon_code : null,
             'discount' => $request->discount ? $request->discount : null,
         );
-
+        $orderInfo = new Order();
+        $orderInfo->order_code = $this->randomCode();
+        $orderInfo->user_id = $request->get('id')? $request->get('id'): null ;
+        $orderInfo->name = $request->get('name');
+        $orderInfo->phone = $request->get('phone'); 
+        $orderInfo->email = $request->get('email');
+        $orderInfo->total_price = $request->get('total_price');
+        $orderInfo->courier_name = $request->get('courier_name');
+        $orderInfo->district = $request->get('district');
+        $orderInfo->delivery_address = $request->get('delivery_address');
+        $orderInfo->delivery_charge = $request->get('delivery_charge');
+        $orderInfo->shipping_area = $request->get('shipping_area');
+        $orderInfo->delivery_method = $request->get('delivery_method');
+        $orderInfo->coupon_code = $request->get('coupon_code');
+        $orderInfo->discount = $request->get('discount');
         $result = Order::create($form_data);
         if ($result) {
+            $orderedProduct = new OrderedProducts();
             foreach ($request->products as $product) {
-                $orderedProduct = new OrderedProducts();
                 $orderedProduct->order_id = $result->id;
                 $orderedProduct->product_id = $product['id'];
                 $orderedProduct->quantity = $product['quantity'];
@@ -394,12 +409,40 @@ class HomePageController extends Controller
                 $orderedProduct->price = $product['price'];
                 $orderedProduct->save();
             }
+            // if($orderInfo->email){
+            //     Mail::send('mail.orderInvoice',['ndata'=>$request->products], function($message) use ($orderInfo) {
+            //         $message->to($orderInfo->email, 'user')->subject('Order Confirmation');
+            //         $message->from('billing@urfashionsbd.com', 'UR Fashion');
+            //           });
+            //           if(Mail::failures()){
+            //             return response()->json([
+            //                 'status'=>false,
+            //                 'message'=>'Failed! Internal Server Error'
+            //             ],501);
+            //           }            
+            // }
 
-                
-
+            
+                $url = "http://bangladeshsms.com/smsapi";
+                $data = [
+                  "api_key" => "R60013405f958b54ab81b9.45973387 ",
+                  "type" => "{content type}",
+                  "contacts" => $request->phone,
+                  "senderid" => "8809612446650",
+                  "msg" => "Hello ". $request->name." Your OrderId ".$result->id. " thank you"
+                ];
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, $url);
+                curl_setopt($ch, CURLOPT_POST, 1);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                $response = curl_exec($ch);
+                curl_close($ch);
+                 return $response;
+              
             return response()->json($this->randomCode(), 200);
         }
-
     }
 
     // Contact Mail Send
