@@ -273,4 +273,39 @@ class ProductController extends Controller
             'message' => 'Product successfully deleted.',
         ], 200);
     }
+
+    // Search with product SKU
+    public function searchProduct($sku){
+        $products = array();
+        $results = Product::where('sku', $sku)->get();
+        foreach ($results as $result) {
+            
+            // Make array from string
+            $colors = explode(',', $result->color);
+            $sizes = explode(',', $result->size);
+
+            $products[] = array(
+                "id" => $result->id,
+                "name" => $result->name,
+                "description" => $result->description,
+                "category_id" => $result->category_id,
+                "parent_category_id" => $result->parent_category_id,
+                "brand" => $result->brand,
+                "campaign_id" => $result->campaign_id,
+                "mrp" => $result->mrp,
+                "selling_price" => $result->selling_price,
+                "sku" => $result->sku,
+                "tags" => $result->tags,
+                "track_inventory" => $result->track_inventory,
+                "stock" => $result->stock,
+                "quantity" => $result->quantity,
+                "weight" => $result->weight,
+                "size" => array_map('trim', $sizes),
+                "color" => array_map('trim', $colors),
+                "feature" => $result->feature,
+                "image" => $this->rootUrl() . '' . '/basic_image/' . $result->image,
+            );
+        }
+        return response()->json($products, 200);
+    }
 }
