@@ -37,6 +37,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['admin']], function () {
     Route::get('subscribers', 'Api\SubscriberController@index');
     Route::get('orders', 'Api\Admin\OrderController@index');
     Route::post('orders/{id}', 'Api\Admin\OrderController@changeStatus');
+    Route::post('order/create', 'Api\Admin\OrderController@CreateOrder');
+    Route::post('order/{id}/update', 'Api\Admin\OrderController@EditOrder');
+    Route::post('order/product/{id}/update', 'Api\Admin\OrderController@EditOrderedProduct');
     Route::get('review', 'Api\VisitorPages\ReviewController@index');
     Route::post('review/{id}', 'Api\VisitorPages\ReviewController@changeStatus');
 

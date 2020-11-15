@@ -353,7 +353,6 @@ class HomePageController extends Controller
             'courier_name' => 'required|string',
             'shipping_area' => 'required|string',
             'delivery_method' => 'required|string',
-            'shipping_area' => 'required|string',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -392,11 +391,6 @@ class HomePageController extends Controller
                 $orderedProduct->price = $product['price'];
                 $orderedProduct->save();
             }
-    //         Mail::send('Mail.index', $data, function($message) {
-    //         $message->to('golamrabbi5242@gmail.com', 'Golam Rabbi')->subject
-    //         ('Order Confirmation');
-    //         $message->from('billing@urfashionsbd.com','Ur Fashion');
-    //   });
 
             return response()->json($this->randomCode(), 200);
         }
