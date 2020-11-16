@@ -12,99 +12,183 @@ use Validator;
 
 class OrderController extends Controller
 {
-   // Root URL
-   public function rootUrl()
-   {
-       return $url = URL::to('');
-   }
-
-   // Random Order Code
-   public function randomCode()
-   {
-       $id = random_int(100, 10000);
-       $result = 'UR' . $id;
-       return $result;
-   }
-
-   // All Orders
-   public function index()
-   {
-       $data = array();
-       $results = Order::orderBy('id', 'DESC')->get();
-       foreach ($results as $result) {
-           $orderedProducts = array();
-           $orders = OrderedProducts::where('order_id', $result->id)->get();
-           foreach ($orders as $order) {
-               $product = Product::where('id', $order->product_id)
-               ->select('name', 'brand', 'mrp', 'selling_price', 'size', 'color', 'image')
-               ->first();
-
-               // Make array from string
-                $colors = explode(',', $product->color);
-                $sizes = explode(',', $product->size);
-
-                $productObj = (object) [
-                    'name' => $product->name,
-                    'brand' => $product->brand,
-                    'mrp' => $product->mrp,
-                    'selling_price' => $product->selling_price,
-                    'size' => array_map('trim', $sizes),
-                    'color' => array_map('trim', $colors),
-                    'image' => $this->rootUrl() . '/basic_image/' . $product->image,
-                ];
-                $orderedProducts[] = array(
-                    'id' => $order->id,
-                    "order_id" => $order->order_id,
-                    "product_id" => $order->product_id,
-                    "product" => $productObj,
-                    "quantity" => $order->quantity,
-                    "size" => $order->size,
-                    "color" => $order->color,
-                    "price" => $order->price,
-                );
-           }
-
-           $data[] = array(
-               "id" => $result->id,
-               "order_code" => $result->order_code,
-               "name" => $result->name,
-               "phone" => $result->phone,
-               "phone" => $result->phone,
-               "email" => $result->email,
-               "total_price" => $result->total_price,
-               "courier_name" => $result->courier_name,
-               "district" => $result->district,
-               "delivery_address" => $result->delivery_address,
-               "delivery_charge" => $result->delivery_charge,
-               "shipping_area" => $result->shipping_area,
-               "delivery_method" => $result->delivery_method,
-               "coupon_code" => $result->coupon_code,
-               "discount" => $result->discount,
-               "status" => $result->status,
-               "products" => $orderedProducts,
-           );
-       }
-       return response()->json($data);
-   }
-
-   // Change Status
-   public function changeStatus(Request $request, $id)
+    // Root URL
+    public function rootUrl()
     {
-       if (!$request->status) {
-           return response()->json(['message' => 'Status is required'], 422);
-       }
+        return $url = URL::to('');
+    }
 
-       $data = Order::where('id', '=', $id)->first();
-       if ($data) {
-           $result = Order::where('id', $data->id)->update(['status' => $request->status]);
-           if ($result) {
-               return response()->json(['message' => 'success'], 200);
-           }
-       } else {
-           return response()->json([
-               'message' => 'Order not found',
-           ], 404);
-       }
+    // Random Order Code
+    public function randomCode()
+    {
+        $id = random_int(100, 10000);
+        $result = 'UR' . $id;
+        return $result;
+    }
+
+    // All Orders
+    public function index()
+    {
+        $data = array();
+        $results = Order::orderBy('id', 'DESC')->get();
+        foreach ($results as $result) {
+            $data[] = array(
+                "id" => $result->id,
+                "name" => $result->name,
+                "phone" => $result->phone,
+                "total_price" => $result->total_price,
+                "shipping_area" => $result->shipping_area,
+                "delivery_method" => $result->delivery_method,
+                "status" => $result->status,
+            );
+        }
+        return response()->json($data);
+    }
+
+    // Show Single Product
+    public function ShowProduct(Request $request, $id)
+    {
+        $orderedProducts = array();
+        $result = Order::where('id', $id)->first();
+        $orders = OrderedProducts::where('order_id', $result->id)->get();
+        foreach ($orders as $order) {
+            $product = Product::where('id', $order->product_id)
+                ->select('name', 'brand', 'mrp', 'selling_price', 'size', 'color', 'image')
+                ->first();
+
+            // Make array from string
+            $colors = explode(',', $product->color);
+            $sizes = explode(',', $product->size);
+
+            $productObj = (object) [
+                'name' => $product->name,
+                'brand' => $product->brand,
+                'mrp' => $product->mrp,
+                'selling_price' => $product->selling_price,
+                'size' => array_map('trim', $sizes),
+                'color' => array_map('trim', $colors),
+                'image' => $this->rootUrl() . '/basic_image/' . $product->image,
+            ];
+            $orderedProducts[] = array(
+                'id' => $order->id,
+                "order_id" => $order->order_id,
+                "product_id" => $order->product_id,
+                "product" => $productObj,
+                "quantity" => $order->quantity,
+                "size" => $order->size,
+                "color" => $order->color,
+                "price" => $order->price,
+            );
+        }
+
+        $data = (object) [
+            "id" => $result->id,
+            "order_code" => $result->order_code,
+            "name" => $result->name,
+            "phone" => $result->phone,
+            "email" => $result->email,
+            "total_price" => $result->total_price,
+            "courier_name" => $result->courier_name,
+            "district" => $result->district,
+            "delivery_address" => $result->delivery_address,
+            "delivery_charge" => $result->delivery_charge,
+            "shipping_area" => $result->shipping_area,
+            "delivery_method" => $result->delivery_method,
+            "coupon_code" => $result->coupon_code,
+            "discount" => $result->discount,
+            "status" => $result->status,
+            "products" => $orderedProducts,
+        ];
+
+        return response()->json($data, 200);
+    }
+
+    // Update Total Price
+    public function PriceUpdate($order_id)
+    {
+        $total = 0;
+        $products = OrderedProducts::where('order_id', $order_id)->get();
+        foreach ($products as $product) {
+            $total += $product->quantity * $product->price;
+        }
+
+        $order = Order::where('id', $order_id)->first();
+        $order->total_price = $total;
+
+        $action = $order->update();
+        if ($action) {
+            return true;
+        }
+        return false;
+    }
+
+    // Add Product into order
+    public function AddProduct(Request $request)
+    {
+        $rules = [
+            'order_id' => 'required',
+            'product_id' => 'required',
+            'quantity' => 'required',
+            'size' => 'required',
+            'color' => 'required',
+            'price' => 'required',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => $validator->messages(),
+            ], 422);
+        }
+
+        $result = OrderedProducts::create($request->all());
+        if ($result) {
+            $this->PriceUpdate($request->order_id);
+        }
+        return response()->json(['status' => true, 'message' => 'Successfully product added'], 200);
+    }
+
+    // Remove Product
+    public function DestroyProduct($id)
+    {
+        $order = OrderedProducts::where('id', $id)->first();
+        $result = OrderedProducts::where('id', $id)->delete();
+        if ($result) {
+            $this->PriceUpdate($order->order_id);
+        }
+        return response()->json(['status' => true, 'message' => 'Product successfully deleted.'], 200);
+    }
+
+    // Edit Ordered Product
+    public function EditOrderedProduct(Request $request, $id)
+    {
+        $data = OrderedProducts::where('id', $id)->first();
+        if ($data) {
+            $result = OrderedProducts::where('id', $id)->update($request->all());
+            if ($result) {
+                return response()->json(['message' => 'Successfully updated.'], 200);
+            }
+        }
+    }
+
+    // Change Status
+    public function changeStatus(Request $request, $id)
+    {
+        if (!$request->status) {
+            return response()->json(['message' => 'Status is required'], 422);
+        }
+
+        $data = Order::where('id', '=', $id)->first();
+        if ($data) {
+            $result = Order::where('id', $data->id)->update(['status' => $request->status]);
+            if ($result) {
+                return response()->json(['message' => 'success'], 200);
+            }
+        } else {
+            return response()->json([
+                'message' => 'Order not found',
+            ], 404);
+        }
     }
 
     // Create Order
@@ -159,12 +243,12 @@ class OrderController extends Controller
 
             return response()->json([
                 'status' => true,
-                'message' => 'Successfully order created.'
+                'message' => 'Successfully order created.',
             ], 200);
         }
     }
 
-    // Edit Order
+    // Edit Ordered Product
     public function EditOrder(Request $request, $id)
     {
         $data = Order::where('id', '=', $id)->first();
@@ -176,15 +260,4 @@ class OrderController extends Controller
         }
     }
 
-     // Edit Ordered Product
-     public function EditOrderedProduct(Request $request, $id)
-     {
-         $data = OrderedProducts::where('id', $id)->first();
-         if ($data) {
-             $result = OrderedProducts::where('id', $id)->update($request->all());
-             if ($result) {
-                 return response()->json(['message' => 'Successfully updated.'], 200);
-             }
-         }
-     }
 }
