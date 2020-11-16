@@ -36,10 +36,18 @@ Route::group(['prefix' => 'admin', 'middleware' => ['admin']], function () {
     Route::apiResource('slider', 'Api\Admin\SliderController');
     Route::get('subscribers', 'Api\SubscriberController@index');
     Route::get('orders', 'Api\Admin\OrderController@index');
+    Route::get('order/{id}/show', 'Api\Admin\OrderController@ShowProduct');
     Route::post('orders/{id}', 'Api\Admin\OrderController@changeStatus');
     Route::post('order/create', 'Api\Admin\OrderController@CreateOrder');
     Route::post('order/{id}/update', 'Api\Admin\OrderController@EditOrder');
+
+    // Ordered Product
+    Route::post('order/product', 'Api\Admin\OrderController@AddProduct');
+    Route::delete('order/product/{id}', 'Api\Admin\OrderController@DestroyProduct');
     Route::post('order/product/{id}/update', 'Api\Admin\OrderController@EditOrderedProduct');
+
+  
+
     Route::get('review', 'Api\VisitorPages\ReviewController@index');
     Route::post('review/{id}', 'Api\VisitorPages\ReviewController@changeStatus');
 
