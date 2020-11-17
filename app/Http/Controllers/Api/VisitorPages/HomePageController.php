@@ -4,22 +4,25 @@ namespace App\Http\Controllers\Api\VisitorPages;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\ContactMail;
 use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\OrderedProducts;
 use App\Models\Product;
 use App\Models\ProductImage;
-use App\Models\Slider;
 use App\Models\Review;
+use App\Models\Slider;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Validator;
-use Mail;
+
+// use Mail;
 
 class HomePageController extends Controller
 {
-    
+
     // root URL
     public function rootUrl()
     {
@@ -345,6 +348,7 @@ class HomePageController extends Controller
     // Confirm Order
     public function confirmOrder(Request $request)
     {
+
         $rules = [
             'name' => 'required|string',
             'phone' => 'required|string|max:255|regex:/(01)[0-9]{9}/',
@@ -378,11 +382,25 @@ class HomePageController extends Controller
             'coupon_code' => $request->coupon_code ? $request->coupon_code : null,
             'discount' => $request->discount ? $request->discount : null,
         );
-
+        $orderInfo = new Order();
+        $orderInfo->order_code = $this->randomCode();
+        $orderInfo->user_id = $request->get('id') ? $request->get('id') : null;
+        $orderInfo->name = $request->get('name');
+        $orderInfo->phone = $request->get('phone');
+        $orderInfo->email = $request->get('email');
+        $orderInfo->total_price = $request->get('total_price');
+        $orderInfo->courier_name = $request->get('courier_name');
+        $orderInfo->district = $request->get('district');
+        $orderInfo->delivery_address = $request->get('delivery_address');
+        $orderInfo->delivery_charge = $request->get('delivery_charge');
+        $orderInfo->shipping_area = $request->get('shipping_area');
+        $orderInfo->delivery_method = $request->get('delivery_method');
+        $orderInfo->coupon_code = $request->get('coupon_code');
+        $orderInfo->discount = $request->get('discount');
         $result = Order::create($form_data);
         if ($result) {
+            $orderedProduct = new OrderedProducts();
             foreach ($request->products as $product) {
-                $orderedProduct = new OrderedProducts();
                 $orderedProduct->order_id = $result->id;
                 $orderedProduct->product_id = $product['id'];
                 $orderedProduct->quantity = $product['quantity'];
@@ -391,15 +409,84 @@ class HomePageController extends Controller
                 $orderedProduct->price = $product['price'];
                 $orderedProduct->save();
             }
+            if ($request->email) {
+                Mail::send('mail.orderInvoice', ['ndata' => $request->products], function ($message) use ($request) {
+                    $message->to($request->email, 'user')->subject('Order Confirmation');
+                    $message->from('billing@urfashionsbd.com', 'UR Fashion');
+                });
+                if (Mail::failures()) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Failed! Internal Server Error',
+                    ], 501);
+                }
+            }
+
+            $url = "http://bangladeshsms.com/smsapi";
+            $data = [
+                "api_key" => "R60013405f958b54ab81b9.45973387 ",
+                "type" => "{content type}",
+                "contacts" => $request->phone,
+                "senderid" => "8809612446650",
+                "msg" => "Hello " . $request->name . " Your OrderId " . $result->id . " thank you",
+            ];
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            $response = curl_exec($ch);
+            curl_close($ch);
+            return $response;
 
             return response()->json($this->randomCode(), 200);
         }
-
     }
 
     // Contact Mail Send
     public function sendEmail(Request $request)
     {
-        
+
+        $rules = [
+            'name' => 'required|string',
+            'email' => 'required|string|email',
+            'phone' => 'required|string|max:255|regex:/(01)[0-9]{9}/',
+            'subject' => 'required|string',
+            'message' => 'required|string',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => $validator->messages(),
+            ], 422);
+        }
+
+        $data = new ContactMail();
+        $data->name = $request->get('name');
+        $data->email = $request->get('email');
+        $data->phone = $request->get('phone');
+        $data->subject = $request->get('subject');
+        $data->message = $request->get('message');
+
+        Mail::send('mail.index', compact('data'), function ($message) use ($data) {
+            $message->from($data->email, $data->name);
+            $message->to('billing@urfashionsbd.com', 'UR Fashion')->subject($data->subject);
+
+        });
+
+        if (Mail::failures()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Failed! Internal Server Error',
+            ], 501);
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Success! Mail Send Successful',
+        ], 200);
     }
+
 }
