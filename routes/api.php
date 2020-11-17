@@ -39,7 +39,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['admin']], function () {
     Route::get('order/{id}/show', 'Api\Admin\OrderController@ShowProduct');
     Route::post('orders/{id}', 'Api\Admin\OrderController@changeStatus');
     Route::post('order/create', 'Api\Admin\OrderController@CreateOrder');
-    Route::post('order/{id}/update', 'Api\Admin\OrderController@EditOrder');
+    Route::post('order/customer/{id}/update', 'Api\Admin\OrderController@EditOrderedCustomer');
+    Route::post('order/apply/coupon', 'Api\Admin\OrderController@ApplyCoupon');
 
     // Ordered Product
     Route::post('order/product', 'Api\Admin\OrderController@AddProduct');

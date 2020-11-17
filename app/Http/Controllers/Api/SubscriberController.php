@@ -12,7 +12,7 @@ class SubscriberController extends Controller
     // Get subscribers
     public function index()
     {
-        $data = Subscriber::all();
+        $data = Subscriber::select('id', 'email')->get();
         if (count($data) > 0) {
             return response()->json([
                 'status' => true,

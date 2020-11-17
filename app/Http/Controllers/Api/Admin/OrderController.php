@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Coupon;
 use App\Models\Order;
 use App\Models\OrderedProducts;
 use App\Models\Product;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use Validator;
@@ -34,6 +36,7 @@ class OrderController extends Controller
         foreach ($results as $result) {
             $data[] = array(
                 "id" => $result->id,
+                "order_code" => $result->order_code,
                 "name" => $result->name,
                 "phone" => $result->phone,
                 "total_price" => $result->total_price,
@@ -51,6 +54,7 @@ class OrderController extends Controller
         $orderedProducts = array();
         $result = Order::where('id', $id)->first();
         $orders = OrderedProducts::where('order_id', $result->id)->get();
+        $coupon = Coupon::where('code', $result->coupon_code)->select('type')->first();
         foreach ($orders as $order) {
             $product = Product::where('id', $order->product_id)
                 ->select('name', 'brand', 'mrp', 'selling_price', 'size', 'color', 'image')
@@ -95,6 +99,7 @@ class OrderController extends Controller
             "shipping_area" => $result->shipping_area,
             "delivery_method" => $result->delivery_method,
             "coupon_code" => $result->coupon_code,
+            "coupon_type" => $coupon ? $coupon->type : null,
             "discount" => $result->discount,
             "status" => $result->status,
             "products" => $orderedProducts,
@@ -113,6 +118,16 @@ class OrderController extends Controller
         }
 
         $order = Order::where('id', $order_id)->first();
+        if ($order->coupon_code) {
+            $coupon = Coupon::where('code', $order->coupon_code)->select('type')->first();
+            if ($coupon->type == 'fixed') {
+                $total = $total - $order->discount;
+            }
+            if ($coupon->type == 'percent') {
+                $total = ($total * $order->discount) / 100;
+            }
+        }
+
         $order->total_price = $total;
 
         $action = $order->update();
@@ -120,6 +135,7 @@ class OrderController extends Controller
             return true;
         }
         return false;
+
     }
 
     // Add Product into order
@@ -166,8 +182,44 @@ class OrderController extends Controller
         if ($data) {
             $result = OrderedProducts::where('id', $id)->update($request->all());
             if ($result) {
-                return response()->json(['message' => 'Successfully updated.'], 200);
+                $this->PriceUpdate($data->order_id);
             }
+            return response()->json(['message' => 'Successfully updated.'], 200);
+        }
+    }
+
+    // Apply Coupon
+    public function ApplyCoupon(Request $request)
+    {
+        $coupon = Coupon::where('code', $request->coupon_code)->first();
+        if (!$coupon) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Coupon not found',
+            ], 404);
+        }
+
+        if ($coupon->validation_date < Carbon::today()) {
+            return response()->json([
+                'status' => false,
+                'message' => 'coupon has been expired',
+            ], 208);
+        }
+
+        $apply = Order::where('id', $request->order_id)
+            ->update([
+                'coupon_code' => $coupon->code,
+                'discount' => $coupon->discount_percent ? $coupon->discount_percent : $coupon->discount_amount,
+            ]);
+
+        if ($apply) {
+            $this->PriceUpdate($request->order_id);
+            return response()->json([
+                'status' => true,
+                'message' => 'Coupon successfully applied',
+                $request->all(),
+                $coupon,
+            ], 200);
         }
     }
 
@@ -248,8 +300,8 @@ class OrderController extends Controller
         }
     }
 
-    // Edit Ordered Product
-    public function EditOrder(Request $request, $id)
+    // Edit Ordered Customer Details
+    public function EditOrderedCustomer(Request $request, $id)
     {
         $data = Order::where('id', '=', $id)->first();
         if ($data) {
