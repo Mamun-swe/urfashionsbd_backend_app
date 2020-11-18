@@ -470,7 +470,7 @@ class HomePageController extends Controller
         $data->subject = $request->get('subject');
         $data->message = $request->get('message');
 
-        Mail::send('mail.index', compact('data'), function ($message) use ($data) {
+        Mail::send('Mail.index', compact('data'), function ($message) use ($data) {
             $message->from($data->email, $data->name);
             $message->to('billing@urfashionsbd.com', 'UR Fashion')->subject($data->subject);
 
