@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Route;
 | routes are loaded by the RouteServiceProvider within a group which
 | is assigned the "api" middleware group. Enjoy building your API!
 |
-*/
+ */
 
 // Auth API's
 Route::post('/login', 'Api\Auth\AuthController@Login');
@@ -22,7 +22,7 @@ Route::get('/logout', 'Api\Auth\AuthController@Logout');
 
 // Admin API's
 Route::group(['prefix' => 'admin', 'middleware' => ['admin']], function () {
-    Route::get('dashboard', 'Api\Admin\DashboardController@index'); 
+    Route::get('dashboard', 'Api\Admin\DashboardController@index');
     Route::get('dashboard/report/{year}', 'Api\Admin\DashboardController@chartReport');
 
     Route::apiResource('/category', 'Api\Admin\CategoryController');
@@ -47,8 +47,6 @@ Route::group(['prefix' => 'admin', 'middleware' => ['admin']], function () {
     Route::post('order/product', 'Api\Admin\OrderController@AddProduct');
     Route::delete('order/product/{id}', 'Api\Admin\OrderController@DestroyProduct');
     Route::post('order/product/{id}/update', 'Api\Admin\OrderController@EditOrderedProduct');
-
-  
 
     Route::get('review', 'Api\VisitorPages\ReviewController@index');
     Route::post('review/{id}', 'Api\VisitorPages\ReviewController@changeStatus');
@@ -80,7 +78,7 @@ Route::group(['prefix' => 'website'], function () {
     Route::get('/coupon/{code}', 'Api\VisitorPages\HomePageController@getCoupon');
     Route::post('/confirmorder', 'Api\VisitorPages\HomePageController@confirmOrder');
     Route::post('/review', 'Api\VisitorPages\ReviewController@create');
-    Route::post('/contactMail', 'Api\VisitorPages\HomePageController@sendEmail');
+    Route::post('/message/send', 'Api\VisitorPages\HomePageController@sendEmail');
 
     Route::post('/subscribe', 'Api\SubscriberController@create');
 });
