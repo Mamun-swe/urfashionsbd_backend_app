@@ -9,7 +9,7 @@
   <title>Ur Fashion Email</title>
 </head>
 
-<body style="width: 43%;margin-left: 31%;">
+<body style="width: 100%;">
   <div class="container"
     style="background-color: #01028f ;width: 100%;padding-right: 15px;padding-left: 15px;margin-right: auto;margin-left: auto;">
     <div class="container"
@@ -21,9 +21,9 @@
           <h1 style="padding-top: 5px">Invoice</h1>
         </div>
         <div class=" bd-highlight"
-          style="color: white;margin-left: auto!important;padding: .5rem!important;box-sizing: border-box;">
+          style="color: white;margin-left: auto!important;padding: .5rem!important;box-sizing: border-box; margin-right: 58px;">
           <h1>UR Fashion</h1>
-          <p>35/A Purana Palton,Dhaka 1000 <br> <a href="tel:+880 1918-836801" style="color: white;">+880
+          <p>35/A Purana Palton,<br>Dhaka 1000<br><a href="tel:+880 1918-836801" style="color: white;">+880
               1918-836801</a> <br> <a href="mailto:urfashionbd@gmail.com"
               style="color: white;">urfashionbd@gmail.com</a> </p>
         </div>
@@ -38,16 +38,23 @@
         style="color: black; padding-top: 20px;margin-bottom: 1rem!important; display: flex!important;box-sizing: border-box;width: 100%;padding-right: 15px;padding-left: 15px;margin-right: auto;margin-left: auto;">
         <div class="p-2 bd-highlight">
           <h5>Bill To:</h5>
-          <p><strong>Name:</strong> Md Golam Rabbi <br>
-            <strong>Phone:</strong> 01762337526 <br>
-            <strong>Email:</strong> golamrabbi5242@gmail.com <br>
-            <strong>District:</strong> Natore <br>
-            <strong>Delivery Address:</strong> natore shador, natore <br>
-            <strong>Courier:</strong>Sundorbon Courier <br>
+          @if ($ndata)
+              
+          <p><strong>Name:</strong> {{ $ndata->name }} <br>
+            <strong>Phone:</strong> {{ $ndata->phone }} <br>
+            <strong>Email:</strong> {{ $ndata->email }}<br>
+            <strong>District:</strong> {{ $ndata->district }}<br>
+            <strong>Shipping Area:</strong> {{ $ndata->shipping_area }}<br>
+            <strong>Delivery Address:</strong> {{ $ndata->delivery_address }} <br>
+            <strong>Courier:</strong>{{ $ndata->delivery_method }} <br>
           </p>
         </div>
-        <div class="bd-highlight" style="color: black;margin-left: auto!important;padding: .5rem!important;">
-          <p><strong>Invoice: order code</strong> <br>
+        <div class="bd-highlight" style="color: black;margin-left: auto!important;padding: .5rem!important;margin-right: 58px;">
+        
+          <p>
+            @if ( $orderCode)
+            <strong>Invoice: {{ $orderCode }}</strong> <br>
+            @endif
             <strong>Date: 10/12/2020</strong>
           </p>
         </div>
@@ -94,56 +101,25 @@
 border-color: grey;  ">
         <thead>
           <tr>
-            <th scope="col">#</th>
-            <th scope="col">Name</th>
-            <th scope="col">size</th>
-            <th scope="col">Color</th>
-            <th scope="col">Quantity</th>
-            <th scope="col">Price</th>
+            <th style="text-align: start;">ID</th>
+            <th style="text-align: start;" >size</th>
+            <th style="text-align: start;">Color</th>
+            <th style="text-align: start;">Quantity</th>
+            <th style="text-align: start;">Price</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <th scope="row">1</th>
-            <td>Casual Cotton comfortable Shirt</td>
-            <td>XL</td>
-            <td>#000</td>
-            <td>2</td>
-            <td>200</td>
-          </tr>
 
-          <tr>
-            <th scope="row">2</th>
-            <td>Casual Cotton comfortable Shirt</td>
-            <td>XL</td>
-            <td>#000</td>
-            <td>2</td>
-            <td>200</td>
+       @foreach ($productInfo as $item)
+         <tr>
+            <td>{{ $item['id'] }}</td>
+            <td>{{ $item['quantity'] }}</td>
+            <td>{{ $item['color'] }}</td>
+            <td>{{ $item['size'] }}</td>
+            <td>{{ $item['price'] }}</td>
+            
           </tr>
-          <tr>
-            <th scope="row">3</th>
-            <td>Casual Cotton comfortable Shirt</td>
-            <td>XL</td>
-            <td>#000</td>
-            <td>2</td>
-            <td>200</td>
-          </tr>
-          <tr>
-            <th scope="row">4</th>
-            <td>Casual Cotton comfortable Shirt</td>
-            <td>XL</td>
-            <td>#000</td>
-            <td>2</td>
-            <td>200</td>
-          </tr>
-          <tr>
-            <th scope="row">5</th>
-            <td>Casual Cotton comfortable Shirt</td>
-            <td>XL</td>
-            <td>#000</td>
-            <td>2</td>
-            <td>200</td>
-          </tr>
+          @endforeach
         </tbody>
       </table>
     </div>
@@ -154,12 +130,15 @@ border-color: grey;  ">
       <div class="bd-highlight"
         style="flex-direction: row-reverse!important;display: flex!important;box-sizing: border-box !important;">
         <div class=" bd-highlight" style="padding: .5rem!important;">
-          <h1 style="float: right;">Total: 5000 Tk</h1>
+          <strong>SubTotal: {{ $ndata->total_price }}</strong> <br>
+          <strong>Discount: {{ $ndata->discount }}</strong> <br>
+          <strong>Delivery Cost: {{ $ndata->delivery_charge }}</strong><br>
+          <h1 style="float: right;">Total: {{ $ndata->total_price + $ndata->delivery_charge -  $ndata->discount }}</h1>
         </div>
       </div>
     </div>
   </div>
-
+  @endif
 </body>
 
 </html>
