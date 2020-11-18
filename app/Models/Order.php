@@ -13,6 +13,7 @@ class Order extends Model
         'phone',
         'email',
         'total_price',
+        'partial_payment',
         'courier_name',
         'district',
         'delivery_address',

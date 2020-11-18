@@ -40,6 +40,7 @@ class OrderController extends Controller
                 "name" => $result->name,
                 "phone" => $result->phone,
                 "total_price" => $result->total_price,
+                "partial_payment" => $result->partial_payment,
                 "shipping_area" => $result->shipping_area,
                 "delivery_method" => $result->delivery_method,
                 "status" => $result->status,
@@ -92,6 +93,7 @@ class OrderController extends Controller
             "phone" => $result->phone,
             "email" => $result->email,
             "total_price" => $result->total_price,
+            "partial_payment" => $result->partial_payment,
             "courier_name" => $result->courier_name,
             "district" => $result->district,
             "delivery_address" => $result->delivery_address,
@@ -104,6 +106,8 @@ class OrderController extends Controller
             "status" => $result->status,
             "products" => $orderedProducts,
         ];
+
+        $this->PriceUpdate($id);
 
         return response()->json($data, 200);
     }
@@ -221,6 +225,32 @@ class OrderController extends Controller
                 $coupon,
             ], 200);
         }
+    }
+
+    // Add Partial Payment
+    public function PartialPayment(Request $request)
+    {
+        if (!$request->partial_payment) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Partial payment is required.',
+            ], 422);
+        }
+
+        $check = Order::where('id', $request->order_id)->first();
+        if (!$check) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Opps! Order not found.',
+            ], 404);
+        }
+
+        $check->update(['partial_payment' => $request->partial_payment]);
+        return response()->json([
+            'status' => true,
+            'message' => 'Partial payment added.',
+        ], 200);
+
     }
 
     // Change Status

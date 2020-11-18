@@ -21,6 +21,7 @@ class CreateOrdersTable extends Migration
             $table->string('phone');
             $table->string('email')->nullable();
             $table->double('total_price');
+            $table->double('partial_payment')->nullable();
             $table->string('courier_name');
             $table->string('district');
             $table->string('delivery_address');
