@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Validator;
+use Illuminate\Support\Facades\DB;
 
 // use Mail;
 
@@ -366,8 +367,10 @@ class HomePageController extends Controller
             ], 422);
         }
 
+
+        $orderCode = $this->randomCode();
         $form_data = array(
-            'order_code' => $this->randomCode(),
+            'order_code' => $orderCode,
             'user_id' => $request->id ? $request->id : null,
             'name' => $request->name,
             'phone' => $request->phone,
@@ -382,24 +385,11 @@ class HomePageController extends Controller
             'coupon_code' => $request->coupon_code ? $request->coupon_code : null,
             'discount' => $request->discount ? $request->discount : null,
         );
-        $orderInfo = new Order();
-        $orderInfo->order_code = $this->randomCode();
-        $orderInfo->user_id = $request->get('id') ? $request->get('id') : null;
-        $orderInfo->name = $request->get('name');
-        $orderInfo->phone = $request->get('phone');
-        $orderInfo->email = $request->get('email');
-        $orderInfo->total_price = $request->get('total_price');
-        $orderInfo->courier_name = $request->get('courier_name');
-        $orderInfo->district = $request->get('district');
-        $orderInfo->delivery_address = $request->get('delivery_address');
-        $orderInfo->delivery_charge = $request->get('delivery_charge');
-        $orderInfo->shipping_area = $request->get('shipping_area');
-        $orderInfo->delivery_method = $request->get('delivery_method');
-        $orderInfo->coupon_code = $request->get('coupon_code');
-        $orderInfo->discount = $request->get('discount');
+        
         $result = Order::create($form_data);
         if ($result) {
             $orderedProduct = new OrderedProducts();
+            $productName=array();
             foreach ($request->products as $product) {
                 $orderedProduct->order_id = $result->id;
                 $orderedProduct->product_id = $product['id'];
@@ -410,7 +400,7 @@ class HomePageController extends Controller
                 $orderedProduct->save();
             }
             if ($request->email) {
-                Mail::send('mail.orderInvoice', ['ndata' => $request->products], function ($message) use ($request) {
+                Mail::send('mail.orderInvoice', ['ndata' => $request,'orderCode'=>$orderCode,'productInfo'=>$request->products,], function ($message) use ($request) {
                     $message->to($request->email, 'user')->subject('Order Confirmation');
                     $message->from('billing@urfashionsbd.com', 'UR Fashion');
                 });
@@ -428,7 +418,7 @@ class HomePageController extends Controller
                 "type" => "{content type}",
                 "contacts" => $request->phone,
                 "senderid" => "8809612446650",
-                "msg" => "Hello " . $request->name . " Your OrderId " . $result->id . " thank you",
+                "msg" => "Hello " . $request->name ." thank You for Your Order Your OrderId " . $orderCode ,
             ];
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $url);
@@ -438,7 +428,7 @@ class HomePageController extends Controller
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
             $response = curl_exec($ch);
             curl_close($ch);
-            return $response;
+            // return $response;
 
             return response()->json($this->randomCode(), 200);
         }
