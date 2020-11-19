@@ -198,7 +198,6 @@ class AuthController extends Controller
                     }
                     return response()->json([
                         'message'=>'password Update success',
-                        'data'=>$code,
                     ],200);
                 }else{
                     return response()->json('passowrd fail to update',404);
