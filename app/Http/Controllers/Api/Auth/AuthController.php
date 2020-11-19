@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use Validator;
+use Illuminate\Support\Facades\Mail;
 
 class AuthController extends Controller
 {
@@ -159,4 +160,52 @@ class AuthController extends Controller
                 ], 404);
             }
         }
+
+        public function passwordReset(Request $request){
+            
+            $rules = [
+                'email' => 'required|email',
+            ];
+    
+            $validator = Validator::make($request->all(), $rules);
+            if ($validator->fails()) {
+                return response()->json([
+                    'message' => $validator->messages(),
+                ],422);
+            }else{
+
+                $email = $request->email;
+                $data = User::where('email',$email)->first();
+                if(empty($data)){
+                    return response()->json('Email Not Match',404);
+                }
+
+                $code = rand(50000000,100000000);
+                
+                $data->password = bcrypt($code);
+                $data->update();
+                if($data){
+
+                    Mail::send('mail.resetPassword', ['data'=>$data,'code'=>$code], function ($message) use ($data) {
+                        $message->from( 'billing@urfashionsbd.com', 'UR Fashion');
+                        $message->to($data->email, $data->name)->subject("Password Reset");
+                    });
+                    if (Mail::failures()) {
+                        return response()->json([
+                            'status' => false,
+                            'message' => 'Failed! Internal Server Error',
+                        ], 501);
+                    }
+                    return response()->json([
+                        'message'=>'password Update success',
+                        'data'=>$code,
+                    ],200);
+                }else{
+                    return response()->json('passowrd fail to update',404);
+                }
+
+       
+            }
+        }
+
 }

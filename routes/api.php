@@ -19,6 +19,8 @@ Route::post('/login', 'Api\Auth\AuthController@Login');
 Route::post('/register', 'Api\Auth\AuthController@Register');
 Route::get('/me', 'Api\Auth\AuthController@Me');
 Route::get('/logout', 'Api\Auth\AuthController@Logout');
+Route::post('/reset/password', 'Api\Auth\AuthController@passwordReset');
+
 
 // Admin API's
 Route::group(['prefix' => 'admin', 'middleware' => ['admin']], function () {
