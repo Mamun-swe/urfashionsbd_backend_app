@@ -101,7 +101,7 @@
 border-color: grey;  ">
         <thead>
           <tr>
-            <th style="text-align: start;">ID</th>
+            <th style="text-align: start;">Name</th>
             <th style="text-align: start;" >size</th>
             <th style="text-align: start;">Color</th>
             <th style="text-align: start;">Quantity</th>
@@ -109,13 +109,12 @@ border-color: grey;  ">
           </tr>
         </thead>
         <tbody>
-
        @foreach ($productInfo as $item)
          <tr>
-            <td>{{ $item['id'] }}</td>
-            <td>{{ $item['quantity'] }}</td>
-            <td>{{ $item['color'] }}</td>
+            <td>{{ $item['name'] }}</td>
             <td>{{ $item['size'] }}</td>
+            <td>{{ $item['color'] }}</td>
+            <td>{{ $item['quantity'] }}</td>
             <td>{{ $item['price'] }}</td>
             
           </tr>
@@ -129,7 +128,8 @@ border-color: grey;  ">
     <div class="container" style="width: 100%;padding-right: 15px;padding-left: 15px;margin-right: auto;margin-left: auto;">
       <div class="bd-highlight"
         style="flex-direction: row-reverse!important;display: flex!important;box-sizing: border-box !important;">
-        <div class=" bd-highlight" style="padding: .5rem!important;">
+        <div class=" bd-highlight" style="padding: .5rem!important;margin-left: auto;
+        margin-right: 71px;">
           <strong>SubTotal: {{ $ndata->total_price }}</strong> <br>
           <strong>Discount: {{ $ndata->discount }}</strong> <br>
           <strong>Delivery Cost: {{ $ndata->delivery_charge }}</strong><br>

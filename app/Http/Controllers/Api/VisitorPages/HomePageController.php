@@ -389,7 +389,7 @@ class HomePageController extends Controller
         $result = Order::create($form_data);
         if ($result) {
             $orderedProduct = new OrderedProducts();
-            $productName=array();
+            // $productName=array();
             foreach ($request->products as $product) {
                 $orderedProduct->order_id = $result->id;
                 $orderedProduct->product_id = $product['id'];
@@ -398,9 +398,12 @@ class HomePageController extends Controller
                 $orderedProduct->size = $product['size'];
                 $orderedProduct->price = $product['price'];
                 $orderedProduct->save();
+                // $productName =array( Product::where('id','=',$product['id'])->select('name')->first());
             }
+        //   return response()->json($request->products,200);
+            // $productInfo = array_merge($productName,$request->products);
             if ($request->email) {
-                Mail::send('mail.orderInvoice', ['ndata' => $request,'orderCode'=>$orderCode,'productInfo'=>$request->products,], function ($message) use ($request) {
+                Mail::send('mail.orderInvoice', ['ndata' => $request,'orderCode'=>$orderCode,'productInfo'=>$request->products], function ($message) use ($request) {
                     $message->to($request->email, 'user')->subject('Order Confirmation');
                     $message->from('billing@urfashionsbd.com', 'UR Fashion');
                 });
@@ -412,22 +415,23 @@ class HomePageController extends Controller
                 }
             }
 
-            $url = "http://bangladeshsms.com/smsapi";
-            $data = [
-                "api_key" => "R60013405f958b54ab81b9.45973387 ",
-                "type" => "{content type}",
-                "contacts" => $request->phone,
-                "senderid" => "8809612446650",
-                "msg" => "Hello " . $request->name ." thank You for Your Order Your OrderId " . $orderCode ,
-            ];
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $url);
-            curl_setopt($ch, CURLOPT_POST, 1);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-            $response = curl_exec($ch);
-            curl_close($ch);
+            // $url = "http://bangladeshsms.com/smsapi";
+            // $data = [
+            //     "api_key" => "R60013405f958b54ab81b9.45973387 ",
+            //     "type" => "{content type}",
+            //     "contacts" => $request->phone,
+            //     "senderid" => "8809612446650",
+            //     "msg" => "Hello " . $request->name ." thank You for Your Order Your OrderId " . $orderCode ,
+            // ];
+            // $ch = curl_init();
+            // curl_setopt($ch, CURLOPT_URL, $url);
+            // curl_setopt($ch, CURLOPT_POST, 1);
+            // curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+            // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            // curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            // $response = curl_exec($ch);
+            // curl_close($ch);
+            
             // return $response;
 
             return response()->json($this->randomCode(), 200);
