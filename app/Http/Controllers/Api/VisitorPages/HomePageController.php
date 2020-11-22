@@ -42,11 +42,11 @@ class HomePageController extends Controller
     {
         // Categories with children category
         $categories = array();
-        $cat_results = Category::where('parent_id', null)->orderBy('id', 'DESC')->get();
+        $cat_results = Category::where('parent_id', null)->orderBy('id', 'ASC')->get();
 
         foreach ($cat_results as $result) {
             $childrenArray = array();
-            $children = Category::where('parent_id', $result->id)->orderBy('id', 'DESC')->get();
+            $children = Category::where('parent_id', $result->id)->orderBy('id', 'ASC')->get();
             foreach ($children as $child) {
                 $childrenArray[] = array(
                     "id" => $child->id,
@@ -118,11 +118,11 @@ class HomePageController extends Controller
     public function categoriesWithChildrens()
     {
         $categories = array();
-        $cat_results = Category::where('parent_id', null)->orderBy('id', 'DESC')->get();
+        $cat_results = Category::where('parent_id', null)->orderBy('id', 'ASC')->get();
 
         foreach ($cat_results as $result) {
             $childrenArray = array();
-            $children = Category::where('parent_id', $result->id)->orderBy('id', 'DESC')->get();
+            $children = Category::where('parent_id', $result->id)->orderBy('id', 'ASC')->get();
             foreach ($children as $child) {
                 $childrenArray[] = array(
                     "id" => $child->id,
