@@ -429,8 +429,6 @@ class HomePageController extends Controller
             $response = curl_exec($ch);
             curl_close($ch);
 
-            // return $response;
-
             return response()->json($this->randomCode(), 200);
         }
     }
