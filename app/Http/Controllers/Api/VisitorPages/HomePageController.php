@@ -418,7 +418,7 @@ class HomePageController extends Controller
                 "type" => "{content type}",
                 "contacts" => $request->phone,
                 "senderid" => "8809612446650",
-                "msg" => "Thank you for your new order from UR Fashions. Your order number:".$orderCode."Hotline: 01918836801 Regards! https://urfashionsbd.com",
+                "msg" => "Thank you for your new order from UR Fashions. Your order number:" . $orderCode . "Hotline: 01918836801 Regards! https://urfashionsbd.com",
             ];
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $url);
