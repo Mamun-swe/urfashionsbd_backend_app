@@ -171,7 +171,7 @@ class AuthController extends Controller
                 $data->update();
                 if($data){
 
-                    Mail::send('mail.resetPassword', ['data'=>$data,'code'=>$code], function ($message) use ($data) {
+                    Mail::send('Mail.resetPassword', ['data'=>$data,'code'=>$code], function ($message) use ($data) {
                         $message->from( 'billing@urfashionsbd.com', 'UR Fashion');
                         $message->to($data->email, $data->name)->subject("Password Reset");
                     });

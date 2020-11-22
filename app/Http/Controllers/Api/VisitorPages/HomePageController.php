@@ -400,7 +400,7 @@ class HomePageController extends Controller
             }
 
             if ($request->email) {
-                Mail::send('mail.orderInvoice', ['ndata' => $request, 'orderCode' => $orderCode, 'productInfo' => $request->products], function ($message) use ($request) {
+                Mail::send('Mail.orderInvoice', ['ndata' => $request, 'orderCode' => $orderCode, 'productInfo' => $request->products], function ($message) use ($request) {
                     $message->to($request->email, 'user')->subject('Order Confirmation');
                     $message->from('billing@urfashionsbd.com', 'UR Fashion');
                 });
@@ -428,8 +428,6 @@ class HomePageController extends Controller
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
             $response = curl_exec($ch);
             curl_close($ch);
-
-            // return $response;
 
             return response()->json($this->randomCode(), 200);
         }
@@ -461,7 +459,7 @@ class HomePageController extends Controller
         $data->subject = $request->get('subject');
         $data->message = $request->get('message');
 
-        Mail::send('mail.index', compact('data'), function ($message) use ($data) {
+        Mail::send('Mail.index', compact('data'), function ($message) use ($data) {
             $message->from($data->email, $data->name);
             $message->to('billing@urfashionsbd.com', 'UR Fashion')->subject($data->subject);
 
