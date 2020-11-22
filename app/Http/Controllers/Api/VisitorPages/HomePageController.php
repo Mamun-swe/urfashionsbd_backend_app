@@ -400,7 +400,7 @@ class HomePageController extends Controller
             }
 
             if ($request->email) {
-                Mail::send('mail.orderInvoice', ['ndata' => $request, 'orderCode' => $orderCode, 'productInfo' => $request->products], function ($message) use ($request) {
+                Mail::send('Mail.orderInvoice', ['ndata' => $request, 'orderCode' => $orderCode, 'productInfo' => $request->products], function ($message) use ($request) {
                     $message->to($request->email, 'user')->subject('Order Confirmation');
                     $message->from('billing@urfashionsbd.com', 'UR Fashion');
                 });

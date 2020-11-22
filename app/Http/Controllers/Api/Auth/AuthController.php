@@ -164,29 +164,7 @@ class AuthController extends Controller
     // Password Reset
     public function passwordReset(Request $request)
     {
-
-                $code = rand(50000000,100000000);
-                
-                $data->password = bcrypt($code);
-                $data->update();
-                if($data){
-
-                    Mail::send('mail.resetPassword', ['data'=>$data,'code'=>$code], function ($message) use ($data) {
-                        $message->from( 'billing@urfashionsbd.com', 'UR Fashion');
-                        $message->to($data->email, $data->name)->subject("Password Reset");
-                    });
-                    if (Mail::failures()) {
-                        return response()->json([
-                            'status' => false,
-                            'message' => 'Failed! Internal Server Error',
-                        ], 501);
-                    }
-                    return response()->json([
-                        'message'=>'password Update success',
-                    ],200);
-                }else{
-                    return response()->json('passowrd fail to update',404);
-                }
+        
         $rules = [
             'email' => 'required|email',
         ];
