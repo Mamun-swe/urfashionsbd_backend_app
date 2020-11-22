@@ -115,7 +115,7 @@ border-color: grey;  ">
             <td>{{ $item['size'] }}</td>
             <td>{{ $item['color'] }}</td>
             <td>{{ $item['quantity'] }}</td>
-            <td>{{ $item['price'] }}</td>
+            <td>{{ $item['selling_price'] }}</td> 
           </tr>
           @endforeach
         </tbody>

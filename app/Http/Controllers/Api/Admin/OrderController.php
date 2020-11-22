@@ -9,6 +9,7 @@ use App\Models\OrderedProducts;
 use App\Models\Product;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Validator;
 
@@ -292,9 +293,9 @@ class OrderController extends Controller
                 'message' => $validator->messages(),
             ], 422);
         }
-
+        $orderCode = $this->randomCode();
         $form_data = array(
-            'order_code' => $this->randomCode(),
+            'order_code' => $orderCode,
             'name' => $request->name,
             'phone' => $request->phone,
             'email' => $request->email ? $request->email : null,
@@ -322,6 +323,37 @@ class OrderController extends Controller
                 $orderedProduct->price = $product['selling_price'];
                 $orderedProduct->save();
             }
+
+            if ($request->email) {
+                Mail::send('mail.adminOrderInvoice', ['ndata' => $request, 'orderCode' => $orderCode, 'productInfo' => $request->products], function ($message) use ($request) {
+                    $message->to($request->email, 'user')->subject('Order Confirmation');
+                    $message->from('billing@urfashionsbd.com', 'UR Fashion');
+                });
+                if (Mail::failures()) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Failed! Internal Server Error',
+                    ], 501);
+                }
+            }
+
+            $url = "http://bangladeshsms.com/smsapi";
+            $data = [
+                "api_key" => "R60013405f958b54ab81b9.45973387 ",
+                "type" => "{content type}",
+                "contacts" => $request->phone,
+                "senderid" => "8809612446650",
+                "msg" => "Thank you for your new order from UR Fashions. Your order number:".$orderCode."Hotline: 01918836801 Regards! https://urfashionsbd.com",
+                 
+            ];
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            $response = curl_exec($ch);
+            curl_close($ch);
 
             return response()->json([
                 'status' => true,
