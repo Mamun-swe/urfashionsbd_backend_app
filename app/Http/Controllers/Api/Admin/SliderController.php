@@ -27,6 +27,7 @@ class SliderController extends Controller
             foreach ($results as $result) {
                 $sliders[] = array(
                     "id" => $result->id,
+                    "category_id" => $result->category_id,
                     "name" => $result->name,
                     "image" => $this->rootUrl() . '' . '/SliderImage/' . $result->image,
                 );
@@ -34,16 +35,6 @@ class SliderController extends Controller
             return response()->json($sliders, 200);
         }
         return response()->json(['status' => false, 'message' => 'Opps ! Slider not found.'], 404);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -59,6 +50,7 @@ class SliderController extends Controller
             'image' => 'required',
         ]);
         $slider = new Slider();
+        $slider->category_id = $request->category_id;
         $slider->name = $request->name;
         if ($request->file('image')) {
             $file = $request->file('image');

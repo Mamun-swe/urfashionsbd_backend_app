@@ -62,14 +62,11 @@ class CategoryController extends Controller
         return response()->json($parentCategories);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
+    // All Category
+    public function Allcategory()
     {
-        //
+        $data = Category::all();
+        return response()->json($data, 200);
     }
 
     /**
