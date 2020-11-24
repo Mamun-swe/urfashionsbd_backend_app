@@ -56,7 +56,6 @@ class AdminUserController extends Controller
             'phone_number' => ['required', 'unique:users'],
             'role' => 'required',
             'password' => 'required|string|min:8',
-            'image' => 'required',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -66,26 +65,46 @@ class AdminUserController extends Controller
             ]);
         }
 
-        $file = $request->file('image');
-        $extension = $file->getClientOriginalExtension();
-        $filename = time() . '.' . $extension;
-        $file->move('users', $filename);
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $extension = $file->getClientOriginalExtension();
+            $filename = time() . '.' . $extension;
+            $file->move('users', $filename);
 
-        $form_data = array(
-            'name' => $request->name,
-            'email' => $request->email,
-            'phone_number' => $request->phone_number,
-            'password' => bcrypt($request->password),
-            'image' => $filename,
-        );
+            $form_data = array(
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone_number' => $request->phone_number,
+                'role' => $request->role,
+                'password' => bcrypt($request->password),
+                'image' => $filename,
+            );
 
-        $user = User::create($form_data);
-        if ($user) {
-            return response()->json(['message' => 'Succesfully account created.'], 200);
+            $user = User::create($form_data);
+            if ($user) {
+                return response()->json(['message' => 'Succesfully account created.'], 200);
+            } else {
+                return response()->json([
+                    'message' => 'Account create failed, please try again.',
+                ], 501);
+            }
         } else {
-            return response()->json([
-                'message' => 'Account create failed, please try again.',
-            ], 501);
+            $form_data = array(
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone_number' => $request->phone_number,
+                'role' => $request->role,
+                'password' => bcrypt($request->password),
+            );
+
+            $user = User::create($form_data);
+            if ($user) {
+                return response()->json(['message' => 'Succesfully account created.'], 200);
+            } else {
+                return response()->json([
+                    'message' => 'Account create failed, please try again.',
+                ], 501);
+            }
         }
     }
 
@@ -105,34 +124,31 @@ class AdminUserController extends Controller
             $extension = $file->getClientOriginalExtension();
             $filename = time() . '.' . $extension;
 
-            if($user->image){
+            if ($user->image) {
                 $old_image = public_path() . '/users/' . $user->image;
                 unlink($old_image);
             }
             $file->move('users', $filename);
 
-            $form_data = array(
-                'name' => $request->name,
-                'phone_number' => $request->phone_number,
-                'email' => $request->email,
-                "role" => $user->role,
-                'image' => $filename,
-            );
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->phone_number = $request->phone_number;
+            $user->role = $request->role;
+            $user->image = $filename;
+            $user->save();
 
-            $user->update($form_data);
             return response()->json([
                 'status' => true,
                 'message' => 'Successfully user updated',
             ], 200);
         }
-        $form_data = array(
-            'name' => $request->name,
-            'phone_number' => $request->phone_number,
-            'email' => $request->email,
-            "role" => $user->role,
-        );
 
-        $user->update($form_data);
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->phone_number = $request->phone_number;
+        $user->role = $request->role;
+        $user->save();
+
         return response()->json([
             'status' => true,
             'message' => 'Successfully user updated',
@@ -228,11 +244,16 @@ class AdminUserController extends Controller
     {
         $user = User::find($id);
         if ($user) {
-            $image = public_path() . '/users/' . $user->image;
-            unlink($image);
+            if ($user->image) {
+                $image = public_path() . '/users/' . $user->image;
+                unlink($image);
+                $user->delete();
+                return response()->json(['status' => true, 'message' => 'Successfully account deleted.'], 200);
+            }
             $user->delete();
             return response()->json(['status' => true, 'message' => 'Successfully account deleted.'], 200);
         }
+
         return response()->json([
             'status' => false,
             'message' => 'nothing to delete',

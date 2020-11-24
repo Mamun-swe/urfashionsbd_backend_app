@@ -420,9 +420,9 @@ class HomePageController extends Controller
 
         $result = Order::create($form_data);
         if ($result) {
-            $orderedProduct = new OrderedProducts();
-
+        
             foreach ($request->products as $product) {
+                $orderedProduct = new OrderedProducts();
                 $orderedProduct->order_id = $result->id;
                 $orderedProduct->product_id = $product['id'];
                 $orderedProduct->quantity = $product['quantity'];
@@ -430,7 +430,6 @@ class HomePageController extends Controller
                 $orderedProduct->size = $product['size'];
                 $orderedProduct->price = $product['price'];
                 $orderedProduct->save();
-
             }
 
             if ($request->email) {

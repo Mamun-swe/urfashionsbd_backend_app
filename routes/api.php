@@ -55,7 +55,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['admin']], function () {
     // user and admin info
     Route::get('/users', 'Api\Admin\AdminUserController@index');
     Route::post('/users', 'Api\Admin\AdminUserController@store');
-    Route::put('/users/{id}', 'Api\Admin\AdminUserController@update');
+    Route::put('/users/update/{id}', 'Api\Admin\AdminUserController@update');
     Route::delete('/users/{id}', 'Api\Admin\AdminUserController@destroy');
     Route::put('/update/{id}/profile', 'Api\Admin\AdminUserController@adminProfileUpdate');
     Route::post('/update/{id}/password', 'Api\Admin\AdminUserController@updateAdminPassword');
