@@ -24,7 +24,7 @@
     <div style="float: left;">
           <h5>Bill To:</h5>
           @if ($ndata)
-              
+
           <p><strong>Name            :  </strong> {{ $ndata->name }} <br>
             <strong>Phone            :  </strong> {{ $ndata->phone }} <br>
             <strong>Email            :  </strong> {{ $ndata->email }}<br>
@@ -34,14 +34,14 @@
             <strong>Courier          :  </strong>{{ $ndata->courier_name }} <br>
           </p>
       </div>
-        <div style="float: left; padding-left: 60px;margin-left: auto;">
+        <div style="width: 200px; padding-left: 60px;margin-left: auto;">
           <h5>Order Details</h5>
 
          <p>Invoice         :  @if ( $orderCode) {{ $orderCode }}  @endif<br>
             Order Status    :   pending <br>
             Delivery Method :   {{ $ndata->delivery_method }} <br>
             Coupon Code     :   {{ $ndata->coupon_code }}<br>
-            Order Date      :   <?php echo date("Y/m/d"); ?> 
+            Order Date      :   <?php echo date("Y/m/d"); ?>
           </p>
         </div>
     </div>
@@ -69,7 +69,7 @@
             <td>{{ $item['size'] }}</td>
             <td>{{ $item['color'] }}</td>
             <td>{{ $item['quantity'] }}</td>
-            <td>{{ $item['selling_price'] }}</td> 
+            <td>{{ $item['selling_price'] }}</td>
           </tr>
           @endforeach
         </tbody>
