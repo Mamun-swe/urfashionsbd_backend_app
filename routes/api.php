@@ -81,7 +81,6 @@ Route::group(['prefix' => 'website'], function () {
     Route::post('/confirmorder', 'Api\VisitorPages\HomePageController@confirmOrder');
     Route::post('/review', 'Api\VisitorPages\ReviewController@create');
     Route::post('/message/send', 'Api\VisitorPages\HomePageController@sendEmail');
-
     Route::post('/subscribe', 'Api\SubscriberController@create');
 });
 
