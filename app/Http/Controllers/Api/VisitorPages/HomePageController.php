@@ -71,46 +71,47 @@ class HomePageController extends Controller
         foreach ($slider_results as $slider) {
             $sliders[] = array(
                 "id" => $slider->id,
+                "category_id" => $slider->category_id,
                 "name" => $slider->name,
                 "image" => $this->rootUrl() . '' . '/SliderImage/' . $slider->image,
             );
         }
 
-        // Latest Products
-        $latestProducts = array();
-        $latest_results = Product::inRandomOrder()->limit(12)->get();
-        foreach ($latest_results as $latest) {
+        // Featured Products
+        $featuredProducts = array();
+        $results = Product::where('feature', 1)->inRandomOrder()->limit(16)->get();
+        foreach ($results as $result) {
             // Make array from string
-            $colors = explode(',', $latest->color);
-            $sizes = explode(',', $latest->size);
+            $colors = explode(',', $result->color);
+            $sizes = explode(',', $result->size);
 
-            $latestProducts[] = array(
-                "id" => $latest->id,
-                "name" => $latest->name,
-                "description" => $latest->description,
-                "category_id" => $latest->category_id,
-                "parent_category_id" => $latest->parent_category_id,
-                "brand" => $latest->brand,
-                "campaign_id" => $latest->campaign_id,
-                "mrp" => $latest->mrp,
-                "selling_price" => $latest->selling_price,
-                "sku" => $latest->sku,
-                "tags" => $latest->tags,
-                "track_inventory" => $latest->track_inventory,
-                "stock" => $latest->stock,
-                "quantity" => $latest->quantity,
-                "weight" => $latest->weight,
+            $featuredProducts[] = array(
+                "id" => $result->id,
+                "name" => $result->name,
+                "description" => $result->description,
+                "category_id" => $result->category_id,
+                "parent_category_id" => $result->parent_category_id,
+                "brand" => $result->brand,
+                "campaign_id" => $result->campaign_id,
+                "mrp" => $result->mrp,
+                "selling_price" => $result->selling_price,
+                "sku" => $result->sku,
+                "tags" => $result->tags,
+                "track_inventory" => $result->track_inventory,
+                "stock" => $result->stock,
+                "quantity" => $result->quantity,
+                "weight" => $result->weight,
                 "size" => array_map('trim', $sizes),
                 "color" => array_map('trim', $colors),
-                "feature" => $latest->feature,
-                "image" => $this->rootUrl() . '' . '/basic_image/' . $latest->image,
+                "feature" => $result->feature,
+                "image" => $this->rootUrl() . '' . '/basic_image/' . $result->image,
             );
         }
 
         return response()->json([
             "categories" => $categories,
             "sliders" => $sliders,
-            "latestProducts" => $latestProducts,
+            "featuredProducts" => $featuredProducts,
         ], 200);
     }
 
@@ -146,21 +147,54 @@ class HomePageController extends Controller
         ], 200);
     }
 
-    // Products of a Category
-    public function productsOfCategory($id)
+    // Products of a Category or Shop
+    public function shopProducts($id = null)
     {
         $products = array();
-        $category = Category::where('id', '=', $id)->first();
-        if (!$category) {
-            return response()->json(["message" => "Category not found"], 501);
+        if ($id) {
+            $category = Category::where('id', '=', $id)->first();
+            if (!$category) {
+                return response()->json(["message" => "Category not found"], 501);
+            }
+
+            $categoryProducts = Product::where('category_id', $category->id)
+                ->orWhere('parent_category_id', $category->id)
+                ->inRandomOrder()
+                ->get();
+
+            foreach ($categoryProducts as $product) {
+                // Make array from string
+                $colors = explode(',', $product->color);
+                $sizes = explode(',', $product->size);
+
+                $products[] = array(
+                    "id" => $product->id,
+                    "name" => $product->name,
+                    "description" => $product->description,
+                    "category_id" => $product->category_id,
+                    "parent_category_id" => $product->parent_category_id,
+                    "brand" => $product->brand,
+                    "campaign_id" => $product->campaign_id,
+                    "mrp" => $product->mrp,
+                    "selling_price" => $product->selling_price,
+                    "sku" => $product->sku,
+                    "tags" => $product->tags,
+                    "track_inventory" => $product->track_inventory,
+                    "stock" => $product->stock,
+                    "quantity" => $product->quantity,
+                    "weight" => $product->weight,
+                    "size" => array_map('trim', $sizes),
+                    "color" => array_map('trim', $colors),
+                    "feature" => $product->feature,
+                    "image" => $this->rootUrl() . '' . '/basic_image/' . $product->image,
+                );
+            }
+            return response()->json($products, 200);
         }
 
-        $categoryProducts = Product::where('category_id', $category->id)
-            ->orWhere('parent_category_id', $category->id)
-            ->inRandomOrder()
-            ->get();
+        $shopProducts = Product::orderBy('id', 'DESC')->get();
 
-        foreach ($categoryProducts as $product) {
+        foreach ($shopProducts as $product) {
             // Make array from string
             $colors = explode(',', $product->color);
             $sizes = explode(',', $product->size);
@@ -187,8 +221,8 @@ class HomePageController extends Controller
                 "image" => $this->rootUrl() . '' . '/basic_image/' . $product->image,
             );
         }
-
         return response()->json($products, 200);
+
     }
 
     // Single Product
@@ -386,9 +420,9 @@ class HomePageController extends Controller
 
         $result = Order::create($form_data);
         if ($result) {
-            $orderedProduct = new OrderedProducts();
-
+        
             foreach ($request->products as $product) {
+                $orderedProduct = new OrderedProducts();
                 $orderedProduct->order_id = $result->id;
                 $orderedProduct->product_id = $product['id'];
                 $orderedProduct->quantity = $product['quantity'];
@@ -396,7 +430,6 @@ class HomePageController extends Controller
                 $orderedProduct->size = $product['size'];
                 $orderedProduct->price = $product['price'];
                 $orderedProduct->save();
-
             }
 
             if ($request->email) {
@@ -418,7 +451,7 @@ class HomePageController extends Controller
                 "type" => "{content type}",
                 "contacts" => $request->phone,
                 "senderid" => "8809612446650",
-                "msg" => "Thank you for your new order from UR Fashions. Your order number: ".$orderCode." Hotline: 01918836801 Regards! www.urfashionsbd.com",
+                "msg" => "Thank you for your new order from UR Fashions. Your order number: " . $orderCode . " Hotline: 01918836801 Regards! www.urfashionsbd.com",
             ];
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $url);

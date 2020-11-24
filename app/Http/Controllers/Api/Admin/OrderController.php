@@ -106,6 +106,7 @@ class OrderController extends Controller
             "discount" => $result->discount,
             "status" => $result->status,
             "products" => $orderedProducts,
+            "created_at" => $result->created_at,
         ];
 
         $this->PriceUpdate($id);
@@ -343,8 +344,8 @@ class OrderController extends Controller
                 "type" => "{content type}",
                 "contacts" => $request->phone,
                 "senderid" => "8809612446650",
-                "msg" => "Thank you for your new order from UR Fashions. Your order number: ".$orderCode." Hotline: 01918836801 Regards! www.urfashionsbd.com",
-                 
+                "msg" => "Thank you for your new order from UR Fashions. Your order number: " . $orderCode . " Hotline: 01918836801 Regards! www.urfashionsbd.com",
+
             ];
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $url);

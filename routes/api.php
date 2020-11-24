@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -21,13 +20,13 @@ Route::get('/me', 'Api\Auth\AuthController@Me');
 Route::get('/logout', 'Api\Auth\AuthController@Logout');
 Route::post('/reset/password', 'Api\Auth\AuthController@passwordReset');
 
-
 // Admin API's
 Route::group(['prefix' => 'admin', 'middleware' => ['admin']], function () {
     Route::get('dashboard', 'Api\Admin\DashboardController@index');
     Route::get('dashboard/report/{year}', 'Api\Admin\DashboardController@chartReport');
 
     Route::apiResource('/category', 'Api\Admin\CategoryController');
+    Route::get('/all/category', 'Api\Admin\CategoryController@Allcategory');
     Route::apiResource('/product', 'Api\Admin\ProductController');
     Route::post('/product/basic-file/{id}', 'Api\Admin\ProductController@updateBasicFile');
     Route::post('/product/additional-image', 'Api\Admin\ProductController@updateAdditionalFiles');
@@ -56,7 +55,7 @@ Route::group(['prefix' => 'admin', 'middleware' => ['admin']], function () {
     // user and admin info
     Route::get('/users', 'Api\Admin\AdminUserController@index');
     Route::post('/users', 'Api\Admin\AdminUserController@store');
-    Route::put('/users/{id}', 'Api\Admin\AdminUserController@update');
+    Route::put('/users/update/{id}', 'Api\Admin\AdminUserController@update');
     Route::delete('/users/{id}', 'Api\Admin\AdminUserController@destroy');
     Route::put('/update/{id}/profile', 'Api\Admin\AdminUserController@adminProfileUpdate');
     Route::post('/update/{id}/password', 'Api\Admin\AdminUserController@updateAdminPassword');
@@ -74,7 +73,7 @@ Route::group(['prefix' => 'user', 'middleware' => ['user']], function () {
 Route::group(['prefix' => 'website'], function () {
     Route::get('', 'Api\VisitorPages\HomePageController@index');
     Route::get('/categories', 'Api\VisitorPages\HomePageController@categoriesWithChildrens');
-    Route::get('/category/{id}/products', 'Api\VisitorPages\HomePageController@productsOfCategory');
+    Route::get('/shop/{id?}', 'Api\VisitorPages\HomePageController@shopProducts');
     Route::get('/product/{id}/show', 'Api\VisitorPages\HomePageController@singleProduct');
     Route::get('/search/{key}', 'Api\VisitorPages\HomePageController@searchProducts');
     Route::get('/coupon/{code}', 'Api\VisitorPages\HomePageController@getCoupon');
