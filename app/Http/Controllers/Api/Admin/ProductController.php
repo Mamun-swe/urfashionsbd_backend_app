@@ -82,7 +82,7 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $sku = Product::where('sku', $request->sku)->first();
-        if($sku){
+        if ($sku) {
             return response()->json([
                 'status' => false,
                 'message' => 'SKU already exist',
@@ -275,11 +275,12 @@ class ProductController extends Controller
     }
 
     // Search with product SKU
-    public function searchProduct($sku){
+    public function searchProduct($sku)
+    {
         $products = array();
         $results = Product::where('sku', $sku)->get();
         foreach ($results as $result) {
-            
+
             // Make array from string
             $colors = explode(',', $result->color);
             $sizes = explode(',', $result->size);
