@@ -78,11 +78,11 @@
 
   <div class="container">
     <div style="margin-left: auto;padding-right: 40px; width: 170px;">
-          <p>SubTotal       : {{ $ndata->total_price }}<br>
+          <p>SubTotal       : {{ $ndata->total_price - $ndata->delivery_charge }}<br>
             Discount        : {{ $ndata->discount }}<br>
             Delivery Charge : {{ $ndata->delivery_charge }}<br>
           </p>
-          <h4>Total : {{ $ndata->total_price + $ndata->delivery_charge -  $ndata->discount }} Tk</h4>
+          <h4>Total : {{ $ndata->total_price - $ndata->discount }} Tk</h4>
         </div>
     </div>
   @endif
