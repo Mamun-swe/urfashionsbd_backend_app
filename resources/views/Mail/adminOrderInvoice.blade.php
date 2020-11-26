@@ -76,11 +76,11 @@
       </table>
   </div>
 
-  <div class="container">
-    <div style="margin-left: auto;padding-right: 40px; width: 170px;">
+  <div class="container" style="padding-top: 20px;">
+    <div style="margin-left: auto;padding-right: 40px; width: 112px;">
           <p>SubTotal       : {{ $ndata->total_price - $ndata->delivery_charge }}<br>
             Discount        : {{ $ndata->discount }}<br>
-            Delivery Charge : {{ $ndata->delivery_charge }}<br>
+            Delivery        : {{ $ndata->delivery_charge }}<br>
           </p>
           <h4>Total : {{ $ndata->total_price - $ndata->discount }} Tk</h4>
         </div>
