@@ -11,7 +11,7 @@
   <div style="width: 700px;margin: auto;background-color: #80808024;height: auto;padding: 20px;">
     <div class="container">
       <div style="text-align: center;">
-          <img src="https://urfashionsbd.com/static/media/logo.66f865ce.png" style="width: 75px;">
+          <img src="https://urfashionsbd.com/static/media/logo.4307c02b.png" style="width: 75px;">
           <h1>UR Fashion</h1>
           <p>35/A Purana Palton Line (V I P Road,<br> Opposite of
             Ananda Bhoban- near City Bank),<br> 1000 Dhaka,
@@ -56,6 +56,7 @@
         <thead>
           <tr>
             <th style="text-align: start;">Name</th>
+            <th style="text-align: start;">SKU</th>
             <th style="text-align: start;" >size</th>
             <th style="text-align: start;">Color</th>
             <th style="text-align: start;">Quantity</th>
@@ -66,8 +67,14 @@
        @foreach ($productInfo as $item)
          <tr>
             <td>{{ $item['name'] }}</td>
+            <td>{{ $item['sku'] }}</td>
             <td>{{ $item['size'] }}</td>
-            <td>{{ $item['color'] }}</td>
+            <td>
+            <span
+                style="width: 20px; height: 20px; background: <?php echo $item['color']; ?>; display:block;"
+              >
+            </span>
+            </td>
             <td>{{ $item['quantity'] }}</td>
             <td>{{ $item['price'] }}</td> 
           </tr>
