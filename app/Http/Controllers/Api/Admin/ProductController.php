@@ -116,21 +116,25 @@ class ProductController extends Controller
         );
 
         $product = Product::create($form_data);
-        if ($product) {
-            if ($request->hasFile('additional_images')) {
-                foreach ($request->additional_images as $file) {
-                    $extension = $file->getClientOriginalExtension();
-                    $filename = uniqid() . '.' . $extension;
-                    $file->move('additional_images', $filename);
+        if ($product && $request->hasFile('additional_images')) {
+            foreach ($request->additional_images as $file) {
+                $extension = $file->getClientOriginalExtension();
+                $filename = uniqid() . '.' . $extension;
+                $file->move('additional_images', $filename);
 
-                    $form_data_images = array(
-                        'product_id' => $product->id,
-                        'image' => $filename,
-                    );
-                    ProductImage::create($form_data_images);
-                }
+                $form_data_images = array(
+                    'product_id' => $product->id,
+                    'image' => $filename,
+                );
+                ProductImage::create($form_data_images);
             }
+            
 
+            return response()->json([
+                'status' => true,
+                'message' => 'Successfully product uploaded',
+            ]);
+        }else{
             return response()->json([
                 'status' => true,
                 'message' => 'Successfully product uploaded',
