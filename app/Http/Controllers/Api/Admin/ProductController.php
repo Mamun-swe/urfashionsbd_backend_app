@@ -116,7 +116,7 @@ class ProductController extends Controller
         );
 
         $product = Product::create($form_data);
-        if ($product && $request->hasFile('additional_images')) {
+        if ($request->hasFile('additional_images')) {
             foreach ($request->additional_images as $file) {
                 $extension = $file->getClientOriginalExtension();
                 $filename = uniqid() . '.' . $extension;
