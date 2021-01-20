@@ -386,9 +386,7 @@ class HomePageController extends Controller
         $rules = [
             'name' => 'required|string',
             'phone' => 'required|string|max:255|regex:/(01)[0-9]{9}/',
-            'district' => 'required|string',
             'delivery_address' => 'required|string',
-            'courier_name' => 'required|string',
             'shipping_area' => 'required|string',
             'delivery_method' => 'required|string',
         ];
@@ -406,16 +404,14 @@ class HomePageController extends Controller
             'user_id' => $request->id ? $request->id : null,
             'name' => $request->name,
             'phone' => $request->phone,
-            'email' => $request->email ? $request->email : null,
             'total_price' => $request->total_price,
-            'courier_name' => $request->courier_name,
-            'district' => $request->district,
             'delivery_address' => $request->delivery_address,
             'delivery_charge' => $request->delivery_charge,
             'shipping_area' => $request->shipping_area,
             'delivery_method' => $request->delivery_method,
             'coupon_code' => $request->coupon_code ? $request->coupon_code : null,
             'discount' => $request->discount ? $request->discount : null,
+            'note' => $request->note ? $request->note : null,
         );
 
         $result = Order::create($form_data);

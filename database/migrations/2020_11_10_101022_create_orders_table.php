@@ -19,11 +19,8 @@ class CreateOrdersTable extends Migration
             $table->integer('user_id')->nullable();
             $table->string('name');
             $table->string('phone');
-            $table->string('email')->nullable();
             $table->double('total_price');
             $table->double('partial_payment')->nullable();
-            $table->string('courier_name');
-            $table->string('district');
             $table->string('delivery_address');
             $table->double('delivery_charge');
             $table->string('shipping_area');
@@ -31,6 +28,7 @@ class CreateOrdersTable extends Migration
             $table->string('coupon_code')->nullable();
             $table->double('discount')->nullable();
             $table->string('status')->default('pending');
+            $table->longText('note')->nullable();
             $table->timestamps();
         });
     }
