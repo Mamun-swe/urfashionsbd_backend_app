@@ -11,7 +11,7 @@
   <div style="width: 700px;margin: auto;background-color: #80808024;height: auto;padding: 20px;">
     <div class="container">
       <div style="text-align: center;">
-          <img src="https://urfashionsbd.com/static/media/logo.66f865ce.png" style="width: 75px;">
+          <img src="https://urfashionsbd.com/static/media/logo.4307c02b.png" style="width: 75px;">
           <h1>UR Fashion</h1>
           <p>35/A Purana Palton Line (V I P Road,<br> Opposite of
             Ananda Bhoban- near City Bank),<br> 1000 Dhaka,
@@ -38,7 +38,7 @@
           <h5>Order Details</h5>
 
          <p>Invoice         :  @if ( $orderCode) {{ $orderCode }}  @endif<br>
-            Order Status    :   pending <br>
+            
             Delivery Method :   {{ $ndata->delivery_method }} <br>
             Coupon Code     :   {{ $ndata->coupon_code }}<br>
             Order Date      :   <?php echo date("Y/m/d"); ?>
