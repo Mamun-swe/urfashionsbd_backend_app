@@ -225,77 +225,105 @@ class HomePageController extends Controller
 
     }
 
-    // Single Product
-    public function singleProduct($id)
-    {
-        $data = Product::find($id);
-        if (!$data) {
-            return response()->json(['message' => 'Product not found'], 404);
-        }
-
-        // Additional images
-        $imagesArray = array();
-        $images = ProductImage::where('product_id', $data->id)->get();
-        foreach ($images as $image) {
-            $imagesArray[] = array(
-                "id" => $image->id,
-                "product_id" => $image->product_id,
-                "image" => $this->rootUrl() . '' . '/additional_images/' . $image->image,
-            );
-        }
-
-        // Reviews
-        $reviewsArray = array();
-        $reviews = Review::where('product_id', $id)
-            ->where('status', 'approved')
-            ->orderBy('id', 'DESC')
-            ->get();
-        foreach ($reviews as $review) {
-            $reviewsArray[] = array(
-                "id" => $review->id,
-                "name" => $review->name,
-                "rating" => $review->rating,
-                "comment" => $review->comment,
-            );
-        }
-
-        // Additional images
-        $imagesArray = array();
-        $images = ProductImage::where('product_id', $data->id)->get();
-        foreach ($images as $image) {
-            $imagesArray[] = array(
-                "id" => $image->id,
-                "product_id" => $image->product_id,
-                "image" => $this->rootUrl() . '' . '/additional_images/' . $image->image,
-            );
-        }
-
-        // Reviews
-        $reviewsArray = array();
-        $reviews = Review::where('product_id', $id)
-            ->where('status', 'approved')
-            ->orderBy('id', 'DESC')
-            ->get();
-        foreach ($reviews as $review) {
-            $reviewsArray[] = array(
-                "id" => $review->id,
-                "name" => $review->name,
-                "rating" => $review->rating,
-                "comment" => $review->comment,
-            );
-        }
-
-        // Related Products
-        $products = array();
-        $result = Product::where('stock', 1)
-            ->where('id', '!=', $data->id)
-            ->where('name', 'like', '%' . $data->name . '%')
-            ->orWhere('sku', 'like', '%' . $data->name . '%')
-            ->orWhere('tags', 'like', '%' . $data->name . '%')
-            ->get();
-
-        return response()->json($product, 200);
-    }
+     // Single Product
+     public function singleProduct($id)
+     {
+         $data = Product::find($id);
+         if (!$data) {
+             return response()->json(['message' => 'Product not found'], 404);
+         }
+ 
+         // Additional images
+         $imagesArray = array();
+         $images = ProductImage::where('product_id', $data->id)->get();
+         foreach ($images as $image) {
+             $imagesArray[] = array(
+                 "id" => $image->id,
+                 "product_id" => $image->product_id,
+                 "image" => $this->rootUrl() . '' . '/additional_images/' . $image->image,
+             );
+         }
+ 
+         // Reviews
+         $reviewsArray = array();
+         $reviews = Review::where('product_id', $id)
+             ->where('status', 'approved')
+             ->orderBy('id', 'DESC')
+             ->get();
+         foreach ($reviews as $review) {
+             $reviewsArray[] = array(
+                 "id" => $review->id,
+                 "name" => $review->name,
+                 "rating" => $review->rating,
+                 "comment" => $review->comment,
+             );
+         }
+ 
+         // Related Products
+         $products = array();
+         $result = Product::where('stock', 1)
+             ->where('id', '!=', $data->id)
+             ->where('name', 'like', '%' . $data->name . '%')
+             ->orWhere('sku', 'like', '%' . $data->name . '%')
+             ->orWhere('tags', 'like', '%' . $data->name . '%')
+             ->get();
+ 
+         foreach ($result as $product) {
+             $products[] = array(
+                 "id" => $product->id,
+                 "name" => $product->name,
+                 "description" => $product->description,
+                 "category_id" => $product->category_id,
+                 "parent_category_id" => $product->parent_category_id,
+                 "brand" => $product->brand,
+                 "campaign_id" => $product->campaign_id,
+                 "mrp" => $product->mrp,
+                 "selling_price" => $product->selling_price,
+                 "sku" => $product->sku,
+                 "tags" => $product->tags,
+                 "track_inventory" => $product->track_inventory,
+                 "stock" => $product->stock,
+                 "quantity" => $product->quantity,
+                 "weight" => $product->weight,
+                 "size" => $product->size,
+                 "color" => $product->color,
+                 "feature" => $product->feature,
+                 "image" => $this->rootUrl() . '' . '/basic_image/' . $product->image,
+             );
+         }
+ 
+         // Make array from string
+         $colors = explode(',', $data->color);
+         $sizes = explode(',', $data->size);
+ 
+         // Single Product
+         $product = (object) [
+             "id" => $data->id,
+             "name" => $data->name,
+             "description" => $data->description,
+             "category_id" => $data->category_id,
+             "parent_category_id" => $data->parent_category_id,
+             "brand" => $data->brand,
+             "campaign_id" => $data->campaign_id,
+             "mrp" => $data->mrp,
+             "selling_price" => $data->selling_price,
+             "sku" => $data->sku,
+             "tags" => $data->tags,
+             "track_inventory" => $data->track_inventory,
+             "stock" => $data->stock,
+             "quantity" => $data->quantity,
+             "weight" => $data->weight,
+             "size" => array_map('trim', $sizes),
+             "color" => array_map('trim', $colors),
+             "feature" => $data->feature,
+             "image" => $this->rootUrl() . '' . '/basic_image/' . $data->image,
+             "images" => $imagesArray,
+             "reviews" => $reviewsArray,
+             "relatedProducts" => $products,
+         ];
+ 
+         return response()->json($product, 200);
+     }
 
     // Search Product
     public function searchProducts($key)
