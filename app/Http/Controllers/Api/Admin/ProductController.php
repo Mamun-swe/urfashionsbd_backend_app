@@ -50,7 +50,7 @@ class ProductController extends Controller
                 "track_inventory" => $result->track_inventory,
                 "stock" => $result->stock,
                 "quantity" => $result->quantity,
-                "weight" => $result->weight,
+                "weight" => $result->weight ? $result->weight : null,
                 "size" => $result->size,
                 "color" => $result->color,
                 "feature" => $result->feature,

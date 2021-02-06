@@ -20,7 +20,6 @@ class Product extends Model
         'track_inventory',
         'stock',
         'quantity',
-        'weight',
         'size',
         'color',
         'feature',
