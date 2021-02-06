@@ -108,7 +108,7 @@ class ProductController extends Controller
             'track_inventory' => true,
             'stock' => $request->stock,
             'quantity' => $request->quantity,
-            'weight' => $request->weight,
+            'weight' => $request->weight ? $request->weight : null,
             'size' => $request->size,
             'color' => $request->color,
             'feature' => false,
@@ -128,13 +128,12 @@ class ProductController extends Controller
                 );
                 ProductImage::create($form_data_images);
             }
-            
 
             return response()->json([
                 'status' => true,
                 'message' => 'Successfully product uploaded',
             ]);
-        }else{
+        } else {
             return response()->json([
                 'status' => true,
                 'message' => 'Successfully product uploaded',
