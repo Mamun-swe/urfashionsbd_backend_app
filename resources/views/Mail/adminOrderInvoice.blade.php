@@ -56,6 +56,7 @@
         <thead>
           <tr>
             <th style="text-align: start;">Name</th>
+            <th style="text-align: start;">SKU</th>
             <th style="text-align: start;" >size</th>
             <th style="text-align: start;">Color</th>
             <th style="text-align: start;">Quantity</th>
@@ -66,8 +67,14 @@
        @foreach ($productInfo as $item)
          <tr>
             <td>{{ $item['name'] }}</td>
+            <td>{{ $item['sku'] }}</td>
             <td>{{ $item['size'] }}</td>
-            <td>{{ $item['color'] }}</td>
+            <td>
+              <span
+                style="width: 20px; height: 20px; background: <?php echo $item['color']; ?>;display:block;"
+              >
+            </span>
+            </td>
             <td>{{ $item['quantity'] }}</td>
             <td>{{ $item['selling_price'] }}</td>
           </tr>

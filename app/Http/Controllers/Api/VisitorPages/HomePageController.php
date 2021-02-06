@@ -232,97 +232,69 @@ class HomePageController extends Controller
         if (!$data) {
             return response()->json(['message' => 'Product not found'], 404);
         }
-        
-            // Additional images
-            $imagesArray = array();
-            $images = ProductImage::where('product_id', $data->id)->get();
-            foreach ($images as $image) {
-                $imagesArray[] = array(
-                    "id" => $image->id,
-                    "product_id" => $image->product_id,
-                    "image" => $this->rootUrl() . '' . '/additional_images/' . $image->image,
-                );
-            }
 
-            // Reviews
-            $reviewsArray = array();
-            $reviews = Review::where('product_id', $id)
-                ->where('status', 'approved')
-                ->orderBy('id', 'DESC')
-                ->get();
-            foreach ($reviews as $review) {
-                $reviewsArray[] = array(
-                    "id" => $review->id,
-                    "name" => $review->name,
-                    "rating" => $review->rating,
-                    "comment" => $review->comment,
-                );
-            }
+        // Additional images
+        $imagesArray = array();
+        $images = ProductImage::where('product_id', $data->id)->get();
+        foreach ($images as $image) {
+            $imagesArray[] = array(
+                "id" => $image->id,
+                "product_id" => $image->product_id,
+                "image" => $this->rootUrl() . '' . '/additional_images/' . $image->image,
+            );
+        }
 
-            // Related Products
-            $products = array();
-            $result = Product::where('stock', 1)
-                ->where('id', '!=', $data->id)
-                ->where('name', 'like', '%' . $data->name . '%')
-                ->orWhere('sku', 'like', '%' . $data->name . '%')
-                ->orWhere('tags', 'like', '%' . $data->name . '%')
-                ->get();
+        // Reviews
+        $reviewsArray = array();
+        $reviews = Review::where('product_id', $id)
+            ->where('status', 'approved')
+            ->orderBy('id', 'DESC')
+            ->get();
+        foreach ($reviews as $review) {
+            $reviewsArray[] = array(
+                "id" => $review->id,
+                "name" => $review->name,
+                "rating" => $review->rating,
+                "comment" => $review->comment,
+            );
+        }
 
-            foreach ($result as $product) {
-                $products[] = array(
-                    "id" => $product->id,
-                    "name" => $product->name,
-                    "description" => $product->description,
-                    "category_id" => $product->category_id,
-                    "parent_category_id" => $product->parent_category_id,
-                    "brand" => $product->brand,
-                    "campaign_id" => $product->campaign_id,
-                    "mrp" => $product->mrp,
-                    "selling_price" => $product->selling_price,
-                    "sku" => $product->sku,
-                    "tags" => $product->tags,
-                    "track_inventory" => $product->track_inventory,
-                    "stock" => $product->stock,
-                    "quantity" => $product->quantity,
-                    "weight" => $product->weight,
-                    "size" => $product->size,
-                    "color" => $product->color,
-                    "feature" => $product->feature,
-                    "image" => $this->rootUrl() . '' . '/basic_image/' . $product->image,
-                );
-            }
+        // Additional images
+        $imagesArray = array();
+        $images = ProductImage::where('product_id', $data->id)->get();
+        foreach ($images as $image) {
+            $imagesArray[] = array(
+                "id" => $image->id,
+                "product_id" => $image->product_id,
+                "image" => $this->rootUrl() . '' . '/additional_images/' . $image->image,
+            );
+        }
 
-            // Make array from string
-            $colors = explode(',', $data->color);
-            $sizes = explode(',', $data->size);
+        // Reviews
+        $reviewsArray = array();
+        $reviews = Review::where('product_id', $id)
+            ->where('status', 'approved')
+            ->orderBy('id', 'DESC')
+            ->get();
+        foreach ($reviews as $review) {
+            $reviewsArray[] = array(
+                "id" => $review->id,
+                "name" => $review->name,
+                "rating" => $review->rating,
+                "comment" => $review->comment,
+            );
+        }
 
-            // Single Product
-            $product = (object) [
-                "id" => $data->id,
-                "name" => $data->name,
-                "description" => $data->description,
-                "category_id" => $data->category_id,
-                "parent_category_id" => $data->parent_category_id,
-                "brand" => $data->brand,
-                "campaign_id" => $data->campaign_id,
-                "mrp" => $data->mrp,
-                "selling_price" => $data->selling_price,
-                "sku" => $data->sku,
-                "tags" => $data->tags,
-                "track_inventory" => $data->track_inventory,
-                "stock" => $data->stock,
-                "quantity" => $data->quantity,
-                "weight" => $data->weight,
-                "size" => array_map('trim', $sizes),
-                "color" => array_map('trim', $colors),
-                "feature" => $data->feature,
-                "image" => $this->rootUrl() . '' . '/basic_image/' . $data->image,
-                "images" => $imagesArray,
-                "reviews" => $reviewsArray,
-                "relatedProducts" => $products,
-            ];
+        // Related Products
+        $products = array();
+        $result = Product::where('stock', 1)
+            ->where('id', '!=', $data->id)
+            ->where('name', 'like', '%' . $data->name . '%')
+            ->orWhere('sku', 'like', '%' . $data->name . '%')
+            ->orWhere('tags', 'like', '%' . $data->name . '%')
+            ->get();
 
-            return response()->json($product, 200);
+        return response()->json($product, 200);
     }
 
     // Search Product
@@ -386,9 +358,7 @@ class HomePageController extends Controller
         $rules = [
             'name' => 'required|string',
             'phone' => 'required|string|max:255|regex:/(01)[0-9]{9}/',
-            'district' => 'required|string',
             'delivery_address' => 'required|string',
-            'courier_name' => 'required|string',
             'shipping_area' => 'required|string',
             'delivery_method' => 'required|string',
         ];
@@ -406,21 +376,19 @@ class HomePageController extends Controller
             'user_id' => $request->id ? $request->id : null,
             'name' => $request->name,
             'phone' => $request->phone,
-            'email' => $request->email ? $request->email : null,
             'total_price' => $request->total_price,
-            'courier_name' => $request->courier_name,
-            'district' => $request->district,
             'delivery_address' => $request->delivery_address,
             'delivery_charge' => $request->delivery_charge,
             'shipping_area' => $request->shipping_area,
             'delivery_method' => $request->delivery_method,
             'coupon_code' => $request->coupon_code ? $request->coupon_code : null,
             'discount' => $request->discount ? $request->discount : null,
+            'note' => $request->note ? $request->note : null,
         );
 
         $result = Order::create($form_data);
         if ($result) {
-        
+
             foreach ($request->products as $product) {
                 $orderedProduct = new OrderedProducts();
                 $orderedProduct->order_id = $result->id;
@@ -434,7 +402,7 @@ class HomePageController extends Controller
 
             if ($request->email) {
                 Mail::send('Mail.orderInvoice', ['ndata' => $request, 'orderCode' => $orderCode, 'productInfo' => $request->products], function ($message) use ($request) {
-                    $message->to([$request->email,'admin@urfashionsbd.com'], 'user')->subject('Order Confirmation');
+                    $message->to([$request->email, 'admin@urfashionsbd.com'], 'user')->subject('Order Confirmation');
                     $message->from('billing@urfashionsbd.com', 'UR Fashion');
                 });
                 if (Mail::failures()) {

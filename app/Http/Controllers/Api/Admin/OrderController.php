@@ -59,7 +59,7 @@ class OrderController extends Controller
         $coupon = Coupon::where('code', $result->coupon_code)->select('type')->first();
         foreach ($orders as $order) {
             $product = Product::where('id', $order->product_id)
-                ->select('name', 'brand', 'mrp', 'selling_price', 'size', 'color', 'image')
+                ->select('name', 'brand', 'mrp', 'selling_price', 'size', 'color', 'image','sku')
                 ->first();
 
             // Make array from string
@@ -73,6 +73,7 @@ class OrderController extends Controller
                 'selling_price' => $product->selling_price,
                 'size' => array_map('trim', $sizes),
                 'color' => array_map('trim', $colors),
+                'sku' =>$product->sku,
                 'image' => $this->rootUrl() . '/basic_image/' . $product->image,
             ];
             $orderedProducts[] = array(
@@ -294,6 +295,7 @@ class OrderController extends Controller
                 'message' => $validator->messages(),
             ], 422);
         }
+
         $orderCode = $this->randomCode();
         $form_data = array(
             'order_code' => $orderCode,
@@ -311,7 +313,6 @@ class OrderController extends Controller
             'coupon_code' => $request->coupon_code ? $request->coupon_code : null,
             'discount' => $request->discount ? $request->discount : null,
         );
-
         $result = Order::create($form_data);
         if ($result) {
             foreach ($request->products as $product) {
