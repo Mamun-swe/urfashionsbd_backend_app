@@ -23,7 +23,8 @@ class ProductController extends Controller
     public function index()
     {
         $products = array();
-        $results = Product::orderBy('id', 'DESC')->get();
+        $results = Product::orderBy('id', 'DESC')
+            ->get();
         foreach ($results as $result) {
             $imagesArray = array();
             $images = ProductImage::where('product_images.product_id', $result->id)->get();
@@ -38,6 +39,7 @@ class ProductController extends Controller
             $products[] = array(
                 "id" => $result->id,
                 "name" => $result->name,
+                "slug" => $result->slug,
                 "description" => $result->description,
                 "category_id" => $result->category_id,
                 "parent_category_id" => $result->parent_category_id,
@@ -96,6 +98,7 @@ class ProductController extends Controller
 
         $form_data = array(
             'name' => $request->name,
+            'slug' => str_replace(' ', '-', $request->name.'-'.time()),
             'description' => $request->description,
             'category_id' => $request->category_id,
             'parent_category_id' => $request->parent_category_id,

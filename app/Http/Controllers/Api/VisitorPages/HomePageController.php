@@ -382,7 +382,6 @@ class HomePageController extends Controller
     // Confirm Order
     public function confirmOrder(Request $request)
     {
-
         $rules = [
             'name' => 'required|string',
             'phone' => 'required|string|max:255|regex:/(01)[0-9]{9}/',
