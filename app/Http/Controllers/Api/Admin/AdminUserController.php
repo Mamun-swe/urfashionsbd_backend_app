@@ -19,7 +19,11 @@ class AdminUserController extends Controller
     public function index(Request $request)
     {
         $data = array();
-        $users = User::all();
+        $users = User::paginate(20);
+
+        $currentPage = $users->currentPage();
+        $lastPage    = $users->lastPage();
+
         if (count($users) > 0) {
             foreach ($users as $user) {
                 $data[] = array(
@@ -31,7 +35,11 @@ class AdminUserController extends Controller
                     "role" => $user->role,
                 );
             }
-            return response()->json($data, 200);
+            return response()->json([
+                'data'=>$data,
+                'currentPage'=>$currentPage,
+                'lastPage'=>$lastPage
+            ],200);
         }
         return response()->json([
             'status' => false,

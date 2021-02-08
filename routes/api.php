@@ -32,6 +32,8 @@ Route::group(['prefix' => 'admin', 'middleware' => ['admin']], function () {
     Route::post('/product/additional-image', 'Api\Admin\ProductController@updateAdditionalFiles');
     Route::delete('/product/additional-image/{id}', 'Api\Admin\ProductController@destroyImage');
     Route::get('/search/{sku}/products', 'Api\Admin\ProductController@searchProduct');
+    // single product
+    Route::get('product/{id}/show','Api\Admin\ProductController@singleProduct');
 
     Route::apiResource('/coupon', 'Api\Admin\CouponController');
     Route::apiResource('slider', 'Api\Admin\SliderController');

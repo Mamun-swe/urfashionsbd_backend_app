@@ -32,22 +32,28 @@ class OrderController extends Controller
     // All Orders
     public function index()
     {
-        $data = array();
-        $results = Order::orderBy('id', 'DESC')->get();
-        foreach ($results as $result) {
-            $data[] = array(
-                "id" => $result->id,
-                "order_code" => $result->order_code,
-                "name" => $result->name,
-                "phone" => $result->phone,
-                "total_price" => $result->total_price,
-                "partial_payment" => $result->partial_payment,
-                "shipping_area" => $result->shipping_area,
-                "delivery_method" => $result->delivery_method,
-                "status" => $result->status,
-            );
+        // $data = array();
+        $results = Order::orderBy('id', 'DESC')
+        ->select(
+            'id',
+            'order_code',
+            'name',
+            'phone',
+            'total_price',
+            'partial_payment',
+            'shipping_area',
+            'delivery_method',
+            'status',
+        )
+        ->paginate(20);
+        if(count($results)>0){
+            return response()->json($results,200);
         }
-        return response()->json($data);
+        return response()->json([
+            'status' => false,
+            'message' => 'order not found',
+        ], 404);
+       
     }
 
     // Show Single Product

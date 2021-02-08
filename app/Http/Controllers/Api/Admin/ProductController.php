@@ -24,7 +24,12 @@ class ProductController extends Controller
     {
         $products = array();
         $results = Product::orderBy('id', 'DESC')
-            ->get();
+        ->paginate(20);
+
+    // pagination pages
+    $currentPage = $results->currentPage();
+    $lastPage    = $results->lastPage();
+
         foreach ($results as $result) {
             $imagesArray = array();
             $images = ProductImage::where('product_images.product_id', $result->id)->get();
@@ -62,7 +67,19 @@ class ProductController extends Controller
                 "images" => $imagesArray,
             );
         }
-        return response()->json($products);
+        if(count($products)>0){
+            return response()->json([
+                'data'=>$products,
+                 'currentPage'=>$currentPage,
+                 'lastPage'=>$lastPage
+             ]);
+        }
+
+        return response()->json([
+            'status' => false,
+            'message' => 'Product not found',
+        ], 404);
+       
     }
 
     /**
@@ -315,4 +332,49 @@ class ProductController extends Controller
         }
         return response()->json($products, 200);
     }
+
+         // Single Product
+         public function singleProduct($id)
+         {
+             $data = Product::find($id);
+             if (!$data) {
+                 return response()->json(['message' => 'Product not found'], 404);
+             }
+     
+             // Additional images
+             $imagesArray = array();
+             $images = ProductImage::where('product_id', $data->id)->get();
+             foreach ($images as $image) {
+                 $imagesArray[] = array(
+                     "id" => $image->id,
+                     "product_id" => $image->product_id,
+                     "image" => $this->rootUrl() . '' . '/additional_images/' . $image->image,
+                 );
+             }
+
+             // Single Product
+             $product = (object) [
+                 "id" => $data->id,
+                 "name" => $data->name,
+                 "description" => $data->description,
+                 "category_id" => $data->category_id,
+                 "parent_category_id" => $data->parent_category_id,
+                 "brand" => $data->brand,
+                 "mrp" => $data->mrp,
+                 "selling_price" => $data->selling_price,
+                 "sku" => $data->sku,
+                 "tags" => $data->tags,
+                 "track_inventory" => $data->track_inventory,
+                 "stock" => $data->stock,
+                 "quantity" => $data->quantity,
+                 "weight" => $data->weight,
+                 "size" => $data->size,
+                 "color" => $data->color,
+                 "feature" => $data->feature,
+                 "image" => $this->rootUrl() . '' . '/basic_image/' . $data->image,
+                 "images" => $imagesArray,
+             ];
+     
+             return response()->json($product, 200);
+         }
 }
