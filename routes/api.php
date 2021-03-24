@@ -85,6 +85,13 @@ Route::group(['prefix' => 'website'], function () {
     Route::post('/subscribe', 'Api\SubscriberController@create');
 });
 
+// Microservices API's
+Route::group(['prefix' => 'services'], function () {
+    Route::get('/dashboard', 'Api\Microservices\MicroserviceController@Dashboard');
+    Route::get('/search/{sku}', 'Api\Microservices\MicroserviceController@SearchBysku');
+    Route::get('/product/{id}', 'Api\Microservices\MicroserviceController@SingleProduct');
+});
+
 // Route::middleware('auth:api')->get('/user', function (Request $request) {
 //     return $request->user();
 // });
